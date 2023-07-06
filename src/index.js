@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import AppSnackbarProvider from './lib/provider/AppSnackBarProvider';
-import {  HashRouter } from "react-router-dom";
+import {  BrowserRouter } from "react-router-dom";
 import AuthProvider from './lib/provider/AuthProvider';
 import RoomsProvider from './lib/provider/RoomsProvider';
 import Header from './modules/layout/components/Header/Header'
@@ -15,7 +15,7 @@ import ConfirmDialogProvider from './lib/provider/ConfirmDialogProvider';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
     <AppSnackbarProvider>
-      <HashRouter>
+      <BrowserRouter>
         <ConfirmDialogProvider>
           <AuthProvider>
             <UserProvider>
@@ -37,6 +37,6 @@ root.render(
             </UserProvider>
           </AuthProvider>
         </ConfirmDialogProvider>
-      </HashRouter>
+      </BrowserRouter>
     </AppSnackbarProvider>
 );
