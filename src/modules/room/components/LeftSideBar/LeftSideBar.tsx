@@ -128,23 +128,6 @@ const LeftSideBar = ({ children }: LeftSideBarProps) => {
         filledIcon: <HomeRepairServiceIcon />,
         href: `/room/${currentRoom.id}/work`,
       },
-      ...(user?.id === currentRoom.manager_id
-        ? [
-            {
-              label: "Thống kê phòng",
-              icon: <AssessmentOutlinedIcon />,
-              filledIcon: <AssessmentIcon />,
-              href: `/room/${currentRoom.id}/statistic`,
-            },
-          ]
-        : [
-            {
-              label: "Thống kê cá nhân",
-              icon: <AssessmentOutlinedIcon />,
-              filledIcon: <AssessmentIcon />,
-              href: `/room/${currentRoom.id}/member/${user?.id || ""}`,
-            },
-          ]),
       {
         label: "Thành viên",
         icon: <PeopleAltOutlinedIcon />,
@@ -167,15 +150,16 @@ const LeftSideBar = ({ children }: LeftSideBarProps) => {
             <CircularProgress />
           ) : (
             <>
-              <Typography variant="h6" style={{
-                overflow: "hidden",
-                whiteSpace: "nowrap",
-                textOverflow: "ellipsis",
-                
-              }}
-              title={currentRoom.name}
+              <Typography
+                variant="h6"
+                style={{
+                  overflow: "hidden",
+                  whiteSpace: "nowrap",
+                  textOverflow: "ellipsis",
+                }}
+                title={currentRoom.name}
               >
-                 {currentRoom.name ? currentRoom.name : "N/A"}
+                {currentRoom.name ? currentRoom.name : "N/A"}
               </Typography>
 
               <Typography

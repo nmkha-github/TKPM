@@ -53,18 +53,6 @@ const MemberTableRow = ({ member }: MemberTableRowProps) => {
         <Typography>{convertTimeToString(member?.joined_at || "")}</Typography>
       </TableCell>
       <TableCell style={{ padding: "4px 8px" }}>
-        <Typography>{member?.toDo}</Typography>
-      </TableCell>
-      <TableCell style={{ padding: "4px 8px" }}>
-        <Typography>{member?.doing}</Typography>
-      </TableCell>
-      <TableCell style={{ padding: "4px 8px" }}>
-        <Typography>{member?.reviewing}</Typography>
-      </TableCell>
-      <TableCell style={{ padding: "4px 8px" }}>
-        <Typography>{member?.done}</Typography>
-      </TableCell>
-      <TableCell style={{ padding: "4px 8px" }}>
         {currentRoom.manager_id === user?.id &&
           currentRoom.manager_id !== member?.id && (
             <IconButton

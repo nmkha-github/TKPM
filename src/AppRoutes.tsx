@@ -9,9 +9,7 @@ import MembersPage from "./pages/RoomPage/[roomId]Page/MembersPage/MembersPage";
 import NewsfeedPage from "./pages/RoomPage/[roomId]Page/NewsfeedPage/NewsfeedPage";
 import SettingRoomPage from "./pages/RoomPage/[roomId]Page/SettingRoomPage/SettingRoomPage";
 import WorkPage from "./pages/RoomPage/[roomId]Page/WorkPage/WorkPage";
-import MemberPage from "./pages/RoomPage/[roomId]Page/MembersPage/[memberId]Page/MemberPage";
 import EmptyPage from "./pages/EmptyPage/EmptyPage";
-import StatisticPage from "./pages/RoomPage/[roomId]Page/StatisticPage/StatisticPage";
 
 const AppRoutes = () => {
   return (
@@ -27,9 +25,7 @@ const AppRoutes = () => {
       <Route path="room" element={<RoomPage />} />
       <Route path="room/:roomId" element={<NewsfeedPage />} />
       <Route path="room/:roomId/newsfeed" element={<NewsfeedPage />} />
-      <Route path="room/:roomId/statistic" element={<StatisticPage />} />
       <Route path="room/:roomId/member" element={<MembersPage />} />
-      <Route path="room/:roomId/member/:memberId" element={<MemberPage />} />
       <Route path="room/:roomId/work" element={<WorkPage />} />
       <Route path="room/:roomId/setting-room" element={<SettingRoomPage />} />
       <Route path="*" element={<EmptyPage />} />

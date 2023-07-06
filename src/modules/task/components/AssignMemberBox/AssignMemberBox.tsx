@@ -101,10 +101,6 @@ const AssignMemberBox = ({ task, onChoose }: AssignMemberBoxProps) => {
                 id: "1",
                 name: "Chưa xác định",
                 avatar: "",
-                toDo: 0,
-                doing: 0,
-                reviewing: 0,
-                done: 0,
                 joined_at: "",
               },
             ])
