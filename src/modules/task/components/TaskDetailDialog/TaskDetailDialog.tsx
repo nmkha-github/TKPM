@@ -52,7 +52,7 @@ import UploadFile from "../../../../lib/components/UploadFile/UploadFile";
 import AssignMemberBox from "../AssignMemberBox/AssignMemberBox";
 import { useNavigate } from "react-router-dom";
 import convertTimeToString from "../../../../lib/util/convert-time-to-string";
-import { useStatistic } from "../../../../lib/provider/StatisticProvider";
+import { useMembers } from "../../../../lib/provider/MembersProvider";
 import { Timestamp } from "firebase/firestore";
 import TaskHelper from "../../util/task-helper";
 import makeStyles from "@mui/styles/makeStyles";
@@ -141,7 +141,7 @@ const TaskDetailDialog = ({ task, open, onClose }: TaskDetailDialogProps) => {
 
   const { currentRoom, loadingCurrentRoom } = useRooms();
   const { updateTask, deleteTask, setCurrentTask } = useTasks();
-  const { member, getMember } = useStatistic();
+  const { member, getMember } = useMembers();
   const { user } = useUser();
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
@@ -309,7 +309,7 @@ const TaskDetailDialog = ({ task, open, onClose }: TaskDetailDialogProps) => {
                   size="small"
                   variant="outlined"
                   error={editTask.title.length > 100}
-                  helperText={!editTask.title.length ? 'Không hợp lệ' : ''}
+                  helperText={!editTask.title.length ? "Không hợp lệ" : ""}
                   onChange={(event) => {
                     setEditTask({ ...editTask, title: event.target.value });
                   }}
@@ -489,9 +489,7 @@ const TaskDetailDialog = ({ task, open, onClose }: TaskDetailDialogProps) => {
               >
                 <ListItemText
                   primary="Trạng thái"
-                  secondary={TaskHelper.convertStatus(
-                    statusOptions[statusSelectedIndex]
-                  )}
+                  secondary={statusOptions[statusSelectedIndex]}
                 />
                 <ExpandMoreIcon />
               </ListItem>
@@ -751,12 +749,12 @@ const TaskDetailDialog = ({ task, open, onClose }: TaskDetailDialogProps) => {
                 room_id: currentRoom.id,
                 id: editTask.id,
                 updateData: {
-                  status: option as "toDo" | "doing" | "reviewing" | "done",
+                  status: option,
                 },
               });
             }}
           >
-            {TaskHelper.convertStatus(option)}
+            {option}
           </MenuItem>
         ))}
       </Menu>

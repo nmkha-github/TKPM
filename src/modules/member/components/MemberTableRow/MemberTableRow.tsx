@@ -12,7 +12,7 @@ import MemberData from "../../interface/member-data";
 import UserData from "../../../user/interface/user-data";
 import convertTimeToString from "../../../../lib/util/convert-time-to-string";
 import { BiArrowFromLeft, BiCrown, BiTrashAlt, BiUser } from "react-icons/bi";
-import { useStatistic } from "../../../../lib/provider/StatisticProvider";
+import { useMembers } from "../../../../lib/provider/MembersProvider";
 import { useRooms } from "../../../../lib/provider/RoomsProvider";
 import { useConfirmDialog } from "../../../../lib/provider/ConfirmDialogProvider";
 import { useUser } from "../../../../lib/provider/UserProvider";
@@ -26,7 +26,7 @@ const MemberTableRow = ({ member }: MemberTableRowProps) => {
   const { roomId } = useParams();
   let navigate = useNavigate();
 
-  const { removeMember } = useStatistic();
+  const { removeMember } = useMembers();
   const { currentRoom } = useRooms();
   const { user } = useUser();
 
@@ -51,18 +51,6 @@ const MemberTableRow = ({ member }: MemberTableRowProps) => {
       </TableCell>
       <TableCell style={{ padding: "4px 8px" }}>
         <Typography>{convertTimeToString(member?.joined_at || "")}</Typography>
-      </TableCell>
-      <TableCell style={{ padding: "4px 8px" }}>
-        <Typography>{member?.toDo}</Typography>
-      </TableCell>
-      <TableCell style={{ padding: "4px 8px" }}>
-        <Typography>{member?.doing}</Typography>
-      </TableCell>
-      <TableCell style={{ padding: "4px 8px" }}>
-        <Typography>{member?.reviewing}</Typography>
-      </TableCell>
-      <TableCell style={{ padding: "4px 8px" }}>
-        <Typography>{member?.done}</Typography>
       </TableCell>
       <TableCell style={{ padding: "4px 8px" }}>
         {currentRoom.manager_id === user?.id &&

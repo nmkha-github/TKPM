@@ -4,7 +4,6 @@ import {
   collection,
   deleteDoc,
   doc,
-  getCountFromServer,
   getDoc,
   getDocs,
   limit,
@@ -14,11 +13,10 @@ import {
   where,
 } from "firebase/firestore";
 import { db } from "../config/firebase-config";
-import MemberData from "../../modules/statistic/interface/member-data";
+import MemberData from "../../modules/member/interface/member-data";
 import UserData from "../../modules/user/interface/user-data";
-import RoomStatistic from "../../modules/room/interface/room-statistic";
 
-interface StatisticContextProps {
+interface MembersContextProps {
   members: MemberData[];
 
   getMembers: (payload: {
@@ -39,13 +37,9 @@ interface StatisticContextProps {
     member_id: string;
   }) => Promise<void>;
   removingMember: boolean;
-
-  roomStatistic: RoomStatistic;
-  getRoomStatistic: (payload: { room_id: string }) => Promise<void>;
-  loadingRoomStatistic: boolean;
 }
 
-const StatisticContext = createContext<StatisticContextProps>({
+const MembersContext = createContext<MembersContextProps>({
   members: [],
 
   getMembers: async () => {},
@@ -57,10 +51,6 @@ const StatisticContext = createContext<StatisticContextProps>({
     id: "",
     name: "",
     avatar: "",
-    toDo: 0,
-    doing: 0,
-    reviewing: 0,
-    done: 0,
     joined_at: "",
     email: "",
     created_at: "",
@@ -71,45 +61,30 @@ const StatisticContext = createContext<StatisticContextProps>({
 
   removeMember: async () => {},
   removingMember: false,
-
-  roomStatistic: { id: "", toDo: 0, doing: 0, reviewing: 0, done: 0 },
-  getRoomStatistic: async () => {},
-  loadingRoomStatistic: false,
 });
 
-interface StatisticContextProviderProps {
+interface MembersContextProviderProps {
   children: React.ReactNode;
 }
 
-const StatisticProvider = ({ children }: StatisticContextProviderProps) => {
+const MembersProvider = ({ children }: MembersContextProviderProps) => {
   const [members, setMembers] = useState<MemberData[]>([]);
   const [member, setMember] = useState<MemberData & UserData>({
     id: "",
     name: "",
     avatar: "",
-    toDo: 0,
-    doing: 0,
-    reviewing: 0,
-    done: 0,
     joined_at: "",
     auth_id: "",
     email: "",
     created_at: "",
   });
-  const [roomStatistic, setRoomStatistic] = useState<RoomStatistic>({
-    id: "",
-    toDo: 0,
-    doing: 0,
-    reviewing: 0,
-    done: 0,
-  });
+
   const [memberDocs, setMemberDocs] = useState<any[]>([]);
   const [loadingMembers, setLoadingMembers] = useState(false);
   const [loadingMoreMembers, setLoadingMoreMembers] = useState(false);
   const [loadedAllMembers, setLoadedAllMembers] = useState(false);
   const [removingMember, setRemovingMember] = useState(false);
   const [loadingMember, setLoadingMember] = useState(false);
-  const [loadingRoomStatistic, setLoadingRoomStatistic] = useState(false);
 
   const { showSnackbarError } = useAppSnackbar();
 
@@ -143,24 +118,20 @@ const StatisticProvider = ({ children }: StatisticContextProviderProps) => {
             )
           );
           setMemberDocs([...memberDocsResponse.docs]);
-          const membersStatistic = memberDocsResponse.docs.map((doc) => {
+          const joinMembers = memberDocsResponse.docs.map((doc) => {
             return {
               id: doc.data().id,
-              toDo: doc.data().toDo,
-              doing: doc.data().doing,
-              reviewing: doc.data().reviewing,
-              done: doc.data().done,
               joined_at: doc.data().joined_at,
             };
           });
-          if (membersStatistic.length) {
+          if (joinMembers.length) {
             const memberDocsResponse = await getDocs(
               query(
                 collection(db, "user"),
                 where(
                   "id",
                   "in",
-                  membersStatistic.map((member) => member.id)
+                  joinMembers.map((member) => member.id)
                 )
               )
             );
@@ -170,9 +141,7 @@ const StatisticProvider = ({ children }: StatisticContextProviderProps) => {
                   name: doc.data().name,
                   avatar: doc.data().avatar,
                   email: doc.data().email,
-                  ...membersStatistic.find(
-                    (member) => member.id === doc.data().id
-                  ),
+                  ...joinMembers.find((member) => member.id === doc.data().id),
                 };
               }),
             ];
@@ -187,24 +156,20 @@ const StatisticProvider = ({ children }: StatisticContextProviderProps) => {
             )
           );
           setMemberDocs([...memberDocs, ...memberDocsResponse.docs]);
-          const membersStatistic = memberDocsResponse.docs.map((doc) => {
+          const joinMembers = memberDocsResponse.docs.map((doc) => {
             return {
               id: doc.data().id,
-              toDo: doc.data().toDo,
-              doing: doc.data().doing,
-              reviewing: doc.data().reviewing,
-              done: doc.data().done,
               joined_at: doc.data().joined_at,
             };
           });
-          if (membersStatistic.length) {
+          if (joinMembers.length) {
             const memberDocsResponse = await getDocs(
               query(
                 collection(db, "user"),
                 where(
                   "id",
                   "in",
-                  membersStatistic.map((member) => member.id)
+                  joinMembers.map((member) => member.id)
                 )
               )
             );
@@ -214,9 +179,7 @@ const StatisticProvider = ({ children }: StatisticContextProviderProps) => {
                   name: doc.data().name,
                   avatar: doc.data().avatar,
                   email: doc.data().email,
-                  ...membersStatistic.find(
-                    (member) => member.id === doc.data().id
-                  ),
+                  ...joinMembers.find((member) => member.id === doc.data().id),
                 };
               }),
             ];
@@ -252,7 +215,7 @@ const StatisticProvider = ({ children }: StatisticContextProviderProps) => {
       try {
         setLoadingMember(true);
 
-        const memberStatisticDocs = await getDocs(
+        const joinMembersDocs = await getDocs(
           query(
             collection(db, "room", room_id, "member"),
             where("id", "==", member_id)
@@ -261,7 +224,7 @@ const StatisticProvider = ({ children }: StatisticContextProviderProps) => {
         const memberInfoDoc = await getDoc(doc(db, "user", member_id));
 
         setMember({
-          ...memberStatisticDocs.docs[0].data(),
+          ...joinMembersDocs.docs[0].data(),
           ...memberInfoDoc.data(),
         } as MemberData & UserData);
       } catch (error) {
@@ -307,54 +270,8 @@ const StatisticProvider = ({ children }: StatisticContextProviderProps) => {
     [members, showSnackbarError]
   );
 
-  const getRoomStatistic = useCallback(
-    async ({ room_id }: { room_id: string }) => {
-      try {
-        setLoadingRoomStatistic(true);
-
-        const toDoDoc = await getCountFromServer(
-          query(
-            collection(db, "room", room_id, "task"),
-            where("status", "==", "toDo")
-          )
-        );
-        const doingDoc = await getCountFromServer(
-          query(
-            collection(db, "room", room_id, "task"),
-            where("status", "==", "doing")
-          )
-        );
-        const reviewingDoc = await getCountFromServer(
-          query(
-            collection(db, "room", room_id, "task"),
-            where("status", "==", "reviewing")
-          )
-        );
-        const doneDoc = await getCountFromServer(
-          query(
-            collection(db, "room", room_id, "task"),
-            where("status", "==", "done")
-          )
-        );
-
-        setRoomStatistic({
-          id: room_id,
-          toDo: toDoDoc.data().count,
-          doing: doingDoc.data().count,
-          reviewing: reviewingDoc.data().count,
-          done: doneDoc.data().count,
-        });
-      } catch (error) {
-        showSnackbarError(error);
-      } finally {
-        setLoadingRoomStatistic(false);
-      }
-    },
-    [showSnackbarError]
-  );
-
   return (
-    <StatisticContext.Provider
+    <MembersContext.Provider
       value={{
         members,
 
@@ -369,20 +286,16 @@ const StatisticProvider = ({ children }: StatisticContextProviderProps) => {
 
         removeMember,
         removingMember,
-
-        roomStatistic,
-        getRoomStatistic,
-        loadingRoomStatistic,
       }}
     >
       {children}
-    </StatisticContext.Provider>
+    </MembersContext.Provider>
   );
 };
 
-export const useStatistic = () => {
-  const store = useContext(StatisticContext);
+export const useMembers = () => {
+  const store = useContext(MembersContext);
   return store;
 };
 
-export default StatisticProvider;
+export default MembersProvider;

@@ -7,7 +7,7 @@ import RoomsProvider from './lib/provider/RoomsProvider';
 import Header from './modules/layout/components/Header/Header'
 import UserProvider from './lib/provider/UserProvider';
 import AppRoutes from './AppRoutes';
-import StatisticProvider from './lib/provider/StatisticProvider';
+import MembersProvider from './lib/provider/MembersProvider';
 import TasksProvider from './lib/provider/TasksProvider';
 import PostsProvider from './lib/provider/PostsProvider';
 import ConfirmDialogProvider from './lib/provider/ConfirmDialogProvider';
@@ -22,7 +22,7 @@ root.render(
               <Header>
                 {/* add provider here */}
                 <RoomsProvider>
-                  <StatisticProvider>
+                  <MembersProvider>
                     <TasksProvider>
                       <PostsProvider>
                         {/* ----------------- */}
@@ -30,7 +30,7 @@ root.render(
                         {/* add provider here */}
                       </PostsProvider>
                     </TasksProvider>
-                  </StatisticProvider>
+                  </MembersProvider>
                 </RoomsProvider>
                 {/* ----------------- */}
               </Header>
