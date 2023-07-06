@@ -47,7 +47,7 @@ interface TasksContextProps {
     room_id: string;
     id: string;
     updateData: {
-      status: "toDo" | "doing" | "reviewing" | "done";
+      status: string;
       order_value?: string;
       assignee_id?: string;
       deadline?: Timestamp | Date | string;
@@ -71,7 +71,7 @@ const TasksContext = createContext<TasksContextProps>({
     id: "",
     title: "",
     order_value: "",
-    status: "toDo",
+    status: "",
     assignee_id: "",
     creator_id: "",
     created_at: "",
@@ -211,7 +211,7 @@ const TasksProvider = ({ children }: TasksContextProviderProps) => {
       room_id: string;
       id: string;
       updateData: {
-        status: "toDo" | "doing" | "reviewing" | "done";
+        status: string;
         order_value?: string;
         assignee_id?: string;
         deadline?: Timestamp | Date | string;
@@ -222,20 +222,6 @@ const TasksProvider = ({ children }: TasksContextProviderProps) => {
       try {
         const time = Timestamp.now();
         setUpdatingTask(true);
-
-        // setTasks(
-        //   tasks.map((task) => {
-        //     if (task.id === id) {
-        //       return {
-        //         last_edit: time,
-        //         ...task,
-        //         ...updateData,
-        //       };
-        //     }
-
-        //     return task;
-        //   })
-        // );
 
         const taskBeforeDoc = await getDoc(
           doc(db, "room", room_id, "task", id)

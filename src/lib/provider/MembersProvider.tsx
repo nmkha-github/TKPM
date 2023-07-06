@@ -13,10 +13,10 @@ import {
   where,
 } from "firebase/firestore";
 import { db } from "../config/firebase-config";
-import MemberData from "../../modules/statistic/interface/member-data";
+import MemberData from "../../modules/member/interface/member-data";
 import UserData from "../../modules/user/interface/user-data";
 
-interface StatisticContextProps {
+interface MembersContextProps {
   members: MemberData[];
 
   getMembers: (payload: {
@@ -39,7 +39,7 @@ interface StatisticContextProps {
   removingMember: boolean;
 }
 
-const StatisticContext = createContext<StatisticContextProps>({
+const MembersContext = createContext<MembersContextProps>({
   members: [],
 
   getMembers: async () => {},
@@ -63,11 +63,11 @@ const StatisticContext = createContext<StatisticContextProps>({
   removingMember: false,
 });
 
-interface StatisticContextProviderProps {
+interface MembersContextProviderProps {
   children: React.ReactNode;
 }
 
-const StatisticProvider = ({ children }: StatisticContextProviderProps) => {
+const MembersProvider = ({ children }: MembersContextProviderProps) => {
   const [members, setMembers] = useState<MemberData[]>([]);
   const [member, setMember] = useState<MemberData & UserData>({
     id: "",
@@ -118,20 +118,20 @@ const StatisticProvider = ({ children }: StatisticContextProviderProps) => {
             )
           );
           setMemberDocs([...memberDocsResponse.docs]);
-          const membersStatistic = memberDocsResponse.docs.map((doc) => {
+          const joinMembers = memberDocsResponse.docs.map((doc) => {
             return {
               id: doc.data().id,
               joined_at: doc.data().joined_at,
             };
           });
-          if (membersStatistic.length) {
+          if (joinMembers.length) {
             const memberDocsResponse = await getDocs(
               query(
                 collection(db, "user"),
                 where(
                   "id",
                   "in",
-                  membersStatistic.map((member) => member.id)
+                  joinMembers.map((member) => member.id)
                 )
               )
             );
@@ -141,9 +141,7 @@ const StatisticProvider = ({ children }: StatisticContextProviderProps) => {
                   name: doc.data().name,
                   avatar: doc.data().avatar,
                   email: doc.data().email,
-                  ...membersStatistic.find(
-                    (member) => member.id === doc.data().id
-                  ),
+                  ...joinMembers.find((member) => member.id === doc.data().id),
                 };
               }),
             ];
@@ -158,20 +156,20 @@ const StatisticProvider = ({ children }: StatisticContextProviderProps) => {
             )
           );
           setMemberDocs([...memberDocs, ...memberDocsResponse.docs]);
-          const membersStatistic = memberDocsResponse.docs.map((doc) => {
+          const joinMembers = memberDocsResponse.docs.map((doc) => {
             return {
               id: doc.data().id,
               joined_at: doc.data().joined_at,
             };
           });
-          if (membersStatistic.length) {
+          if (joinMembers.length) {
             const memberDocsResponse = await getDocs(
               query(
                 collection(db, "user"),
                 where(
                   "id",
                   "in",
-                  membersStatistic.map((member) => member.id)
+                  joinMembers.map((member) => member.id)
                 )
               )
             );
@@ -181,9 +179,7 @@ const StatisticProvider = ({ children }: StatisticContextProviderProps) => {
                   name: doc.data().name,
                   avatar: doc.data().avatar,
                   email: doc.data().email,
-                  ...membersStatistic.find(
-                    (member) => member.id === doc.data().id
-                  ),
+                  ...joinMembers.find((member) => member.id === doc.data().id),
                 };
               }),
             ];
@@ -219,7 +215,7 @@ const StatisticProvider = ({ children }: StatisticContextProviderProps) => {
       try {
         setLoadingMember(true);
 
-        const memberStatisticDocs = await getDocs(
+        const joinMembersDocs = await getDocs(
           query(
             collection(db, "room", room_id, "member"),
             where("id", "==", member_id)
@@ -228,7 +224,7 @@ const StatisticProvider = ({ children }: StatisticContextProviderProps) => {
         const memberInfoDoc = await getDoc(doc(db, "user", member_id));
 
         setMember({
-          ...memberStatisticDocs.docs[0].data(),
+          ...joinMembersDocs.docs[0].data(),
           ...memberInfoDoc.data(),
         } as MemberData & UserData);
       } catch (error) {
@@ -275,7 +271,7 @@ const StatisticProvider = ({ children }: StatisticContextProviderProps) => {
   );
 
   return (
-    <StatisticContext.Provider
+    <MembersContext.Provider
       value={{
         members,
 
@@ -293,13 +289,13 @@ const StatisticProvider = ({ children }: StatisticContextProviderProps) => {
       }}
     >
       {children}
-    </StatisticContext.Provider>
+    </MembersContext.Provider>
   );
 };
 
-export const useStatistic = () => {
-  const store = useContext(StatisticContext);
+export const useMembers = () => {
+  const store = useContext(MembersContext);
   return store;
 };
 
-export default StatisticProvider;
+export default MembersProvider;

@@ -296,10 +296,6 @@ const RoomsProvider = ({ children }: RoomsContextProviderProps) => {
           id: user.id,
           joined_at: time,
           joined_at_value: time.toMillis(),
-          toDo: 0,
-          doing: 0,
-          reviewing: 0,
-          done: 0,
         });
 
         setRooms([
@@ -395,10 +391,6 @@ const RoomsProvider = ({ children }: RoomsContextProviderProps) => {
           id: user.id,
           joined_at: time,
           joined_at_value: time.toMillis(),
-          toDo: 0,
-          doing: 0,
-          reviewing: 0,
-          done: 0,
         });
 
         setRooms([{ ...newRoom, joined_at: time } as RoomData, ...rooms]);

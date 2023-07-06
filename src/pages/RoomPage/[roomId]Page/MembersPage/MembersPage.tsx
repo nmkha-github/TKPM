@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import LeftSideBar from "../../../../modules/room/components/LeftSideBar/LeftSideBar";
-import { useStatistic } from "../../../../lib/provider/StatisticProvider";
+import { useMembers } from "../../../../lib/provider/MembersProvider";
 import { useRooms } from "../../../../lib/provider/RoomsProvider";
 import {
   Box,
@@ -14,7 +14,7 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import MemberTableRow from "../../../../modules/statistic/components/MemberTableRow/MemberTableRow";
+import MemberTableRow from "../../../../modules/member/components/MemberTableRow/MemberTableRow";
 import { useParams } from "react-router-dom";
 
 const MembersPage = () => {
@@ -26,7 +26,7 @@ const MembersPage = () => {
     loadingMembers,
     loadingMoreMembers,
     loadedAllMembers,
-  } = useStatistic();
+  } = useMembers();
 
   useEffect(() => {
     getCurrentRoom(roomId || "");

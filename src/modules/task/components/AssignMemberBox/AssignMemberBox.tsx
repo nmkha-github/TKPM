@@ -2,8 +2,8 @@ import { MenuItem } from "@mui/material";
 import { Avatar, Box, Menu, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useStatistic } from "../../../../lib/provider/StatisticProvider";
-import MemberData from "../../../statistic/interface/member-data";
+import { useMembers } from "../../../../lib/provider/MembersProvider";
+import MemberData from "../../../member/interface/member-data";
 import USER_AVATAR_DEFAULT from "../../../user/contants/user-avatar-default";
 import UserData from "../../../user/interface/user-data";
 import UserHelper from "../../../user/util/user-helper";
@@ -22,7 +22,7 @@ const AssignMemberBox = ({ task, onChoose }: AssignMemberBoxProps) => {
   const [assignee, setAssignee] = useState<MemberData | UserData>();
 
   const { roomId } = useParams();
-  const { getMembers, members } = useStatistic();
+  const { getMembers, members } = useMembers();
 
   const getAssigneeInfo = async () => {
     const assigneeInfo = await UserHelper.getUserById(task.assignee_id);
