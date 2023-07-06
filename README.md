@@ -1,7 +1,7 @@
 
 # Manage Task Web Application
 
-Subject project (Nhập môn công nghệ phần mềm) about building CRUD Application on Web channel.
+Subject project (Thiết kế phần mềm).
 
 
 
@@ -9,7 +9,7 @@ Subject project (Nhập môn công nghệ phần mềm) about building CRUD Appl
 Task Management provide eviroment to manage tasks of rooms in the company or manage tasks in projects of team, office and so on.
 
 ## Production
-Link to Production: [Try this](https://nmcnpm-group24.vercel.app/)
+Link to Production: [Try this](https://tkpm-olive.vercel.app/)
 
 ## Tech Stack
 
@@ -111,8 +111,6 @@ Config in vercel deploy by branch main in this repository when merge branch or a
 - Link project with repository in github
 - Config deploy by branch main
 ## Contributors
-- [18120447 - Lê Hoàng Long](https://github.com/long060200)
-- [20120391 - Phan Dương Linh](https://github.com/LTCuberik)
 - [20120497 - Nguyễn Quang Huy](https://github.com/QuangHuy54)
 - [20120502 - Nguyễn Minh Kha](https://github.com/nmkha-github)
 - [20120545 - Lê Hoài Phong](https://github.com/Phongle1311)
