@@ -120,7 +120,10 @@ const useStyle = makeStyles((theme) => ({
   },
 }));
 
-const TaskDetailDialog = ({ task, open, onClose }: TaskDetailDialogProps) => {
+const TaskDetailDialog = ({
+  task,
+  ...dialogProps
+}: TaskDetailDialogProps & DialogProps) => {
   const emptyTask = {
     id: "",
     title: "",
@@ -171,7 +174,12 @@ const TaskDetailDialog = ({ task, open, onClose }: TaskDetailDialogProps) => {
   }, [task]);
 
   return (
-    <Dialog open={open} fullScreen={fullScreen} fullWidth={true} maxWidth="lg">
+    <Dialog
+      fullScreen={fullScreen}
+      fullWidth={true}
+      maxWidth="lg"
+      {...dialogProps}
+    >
       <Box className={classes.dialog}>
         {/* Header of the dialog */}
         <Box className={classes.dialog_header}>
@@ -260,7 +268,7 @@ const TaskDetailDialog = ({ task, open, onClose }: TaskDetailDialogProps) => {
               TransitionComponent={Fade}
               arrow
               onClick={() => {
-                onClose?.();
+                dialogProps.onClose?.();
                 setEditTask({ ...emptyTask });
                 setVoted(false);
                 setWatches(false);
@@ -309,7 +317,7 @@ const TaskDetailDialog = ({ task, open, onClose }: TaskDetailDialogProps) => {
                   size="small"
                   variant="outlined"
                   error={editTask.title.length > 100}
-                  helperText={!editTask.title.length ? 'Không hợp lệ' : ''}
+                  helperText={!editTask.title.length ? "Không hợp lệ" : ""}
                   onChange={(event) => {
                     setEditTask({ ...editTask, title: event.target.value });
                   }}
@@ -694,7 +702,7 @@ const TaskDetailDialog = ({ task, open, onClose }: TaskDetailDialogProps) => {
                   id: task?.id || "",
                 });
                 setCurrentTask(undefined);
-                onClose?.();
+                dialogProps.onClose?.();
               },
             });
           }}
