@@ -12,6 +12,7 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import { DragDropContext, DragStart, DropResult } from "react-beautiful-dnd";
 import CreateTaskDialog from "../../../../modules/task/components/CreateTaskDialog/CreateTaskDialog";
 import TaskHelper from "../../../../modules/task/util/task-helper";
+import ShowMenuButton from "../../../../lib/components/ShowMenuButton/ShowMenuButton";
 
 const WorkPage = () => {
   const [tasksToDo, setTasksToDo] = useState<TaskData[]>([]);
@@ -175,26 +176,38 @@ const WorkPage = () => {
     <>
       <LeftSideBar>
         <Box style={{ display: "flex", flexDirection: "column" }}>
-          <Button
-            variant="contained"
-            color="primary"
-            style={{
-              margin: "0.625rem",
-              width: "200px",
-              textTransform: "none",
-            }}
-            onClick={() => {
-              setOpenCreateTaskDialog(true);
-            }}
-          >
-            <Typography style={{ fontWeight: 600 }}>Tạo công việc</Typography>
-          </Button>
-          <CreateTaskDialog
-            open={openCreateTaskDialog}
-            onClose={() => {
-              setOpenCreateTaskDialog(false);
-            }}
-          />
+          <Box style={{ display: "flex", justifyContent: "space-between" }}>
+            <Button
+              variant="contained"
+              color="primary"
+              style={{
+                margin: "0.625rem",
+                width: "200px",
+                textTransform: "none",
+              }}
+              onClick={() => {
+                setOpenCreateTaskDialog(true);
+              }}
+            >
+              <Typography style={{ fontWeight: 600 }}>Tạo công việc</Typography>
+            </Button>
+            <CreateTaskDialog
+              open={openCreateTaskDialog}
+              onClose={() => {
+                setOpenCreateTaskDialog(false);
+              }}
+            />
+
+            {/* Actions Button */}
+            <Box style={{ marginRight: "1rem" }}>
+              <ShowMenuButton
+                title="Xuất"
+                itemsTitle={["Xuất Word", "Xuất HTML", "Xuất CSV"]}
+                itemsAction={[() => {}, () => {}, () => {}]}
+                tooltipTitle="Xuất tất cả công việc"
+              />
+            </Box>
+          </Box>
 
           <Box
             style={{
