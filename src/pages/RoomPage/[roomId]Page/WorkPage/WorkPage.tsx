@@ -13,6 +13,7 @@ import { DragDropContext, DragStart, DropResult } from "react-beautiful-dnd";
 import CreateTaskDialog from "../../../../modules/task/components/CreateTaskDialog/CreateTaskDialog";
 import TaskHelper from "../../../../modules/task/util/task-helper";
 import ShowMenuButton from "../../../../lib/components/ShowMenuButton/ShowMenuButton";
+import { CSVLink } from "react-csv";
 
 const WorkPage = () => {
   const [tasksToDo, setTasksToDo] = useState<TaskData[]>([]);
@@ -172,6 +173,40 @@ const WorkPage = () => {
     }
   };
 
+  const tasksDataCSV = [
+    [
+      "ID",
+      "Title",
+      "Content",
+      "Status",
+      "Assignee's ID",
+      "Creator's ID",
+      "Created at",
+      "Deadline",
+    ],
+    ...tasks.map(
+      ({
+        id,
+        title,
+        content,
+        status,
+        assignee_id,
+        creator_id,
+        created_at,
+        deadline,
+      }) => [
+        id,
+        title,
+        content || "",
+        status || "",
+        assignee_id || "",
+        creator_id,
+        created_at,
+        deadline || "",
+      ]
+    ),
+  ];
+
   return (
     <>
       <LeftSideBar>
@@ -199,13 +234,35 @@ const WorkPage = () => {
             />
 
             {/* Actions Button */}
-            <Box style={{ marginRight: "1rem" }}>
-              <ShowMenuButton
+            <Box
+              style={{
+                marginRight: "1rem",
+                display: "flex",
+                gap: "10px",
+                alignItems: "center",
+              }}
+            >
+              {/* <ShowMenuButton
                 title="Xuất"
                 itemsTitle={["Xuất Word", "Xuất HTML", "Xuất CSV"]}
                 itemsAction={[() => {}, () => {}, () => {}]}
                 tooltipTitle="Xuất tất cả công việc"
-              />
+              /> */}
+
+              <CSVLink
+                data={tasksDataCSV}
+                filename={"tasks.csv"}
+                style={{
+                  textDecoration: "none",
+                  padding: "10px",
+                  display: "block",
+                  lor: "rgb(23,43,77)",
+                  textTransform: "none",
+                  background: "#DDD",
+                }}
+              >
+                Xuất CSV
+              </CSVLink>
             </Box>
           </Box>
 
