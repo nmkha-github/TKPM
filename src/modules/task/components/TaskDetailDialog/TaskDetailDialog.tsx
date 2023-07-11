@@ -587,8 +587,8 @@ const TaskDetailDialog = ({
                     <TableCell>
                       <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
-                          value={task?.deadline || null}
-                          inputFormat="DD/MM/YYYY"
+                          value={(task?.deadline as Timestamp) || null}
+                          inputFormat={"DD/MM/YYYY"}
                           onChange={async (newValue: Timestamp | null) => {
                             if (
                               !newValue ||
