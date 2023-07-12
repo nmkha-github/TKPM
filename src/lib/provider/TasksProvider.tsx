@@ -20,11 +20,40 @@ import FileData from "../interface/file-data";
 import CommentData from "../interface/comment-data";
 import { useUser } from "./UserProvider";
 import TaskHelper from "../../modules/task/util/task-helper";
+import TaskStatusData from "../../modules/task/interface/task-status-data";
 
 interface TasksContextProps {
+  taskStatuses: TaskStatusData[];
+  getTaskStatuses: (payload: { room_id: string }) => Promise<void>;
+
+  updateTaskStatus: (payload: {
+    room_id: string;
+    task_status_id: string;
+    updateData: {
+      name?: string;
+      order?: number;
+    };
+  }) => Promise<void>;
+  updatingTaskStatus: boolean;
+
+  createTaskStatus: (payload: {
+    room_id: string;
+    new_task_status: {
+      name: string;
+      order: number;
+    };
+  }) => Promise<void>;
+  creatingTaskStatus: boolean;
+
+  deleteTaskStatus: (payload: {
+    room_id: string;
+    task_status_id: string;
+  }) => Promise<void>;
+  deletingTaskStatus: boolean;
+
   tasks: TaskData[];
+  setTasks: (tasks: TaskData[]) => void;
   getTasks: (payload: { room_id: string }) => Promise<void>;
-  loadingTasks: boolean;
 
   currentTask?: TaskData;
   setCurrentTask: (task?: TaskData) => void;
@@ -62,10 +91,21 @@ interface TasksContextProps {
 }
 
 const TasksContext = createContext<TasksContextProps>({
-  tasks: [],
+  taskStatuses: [],
+  getTaskStatuses: async () => {},
 
+  updateTaskStatus: async () => {},
+  updatingTaskStatus: false,
+
+  createTaskStatus: async () => {},
+  creatingTaskStatus: false,
+
+  deleteTaskStatus: async () => {},
+  deletingTaskStatus: false,
+
+  tasks: [],
+  setTasks: () => {},
   getTasks: async () => {},
-  loadingTasks: false,
 
   currentTask: {
     id: "",
@@ -93,9 +133,13 @@ interface TasksContextProviderProps {
 }
 
 const TasksProvider = ({ children }: TasksContextProviderProps) => {
+  const [taskStatuses, setTaskStatuses] = useState<TaskStatusData[]>([]);
+  const [updatingTaskStatus, setUpdatingTaskStatus] = useState(false);
+  const [creatingTaskStatus, setCreatingTaskStatus] = useState(false);
+  const [deletingTaskStatus, setDeletingTaskStatus] = useState(false);
+
   const [tasks, setTasks] = useState<TaskData[]>([]);
   const [currentTask, setCurrentTask] = useState<TaskData>();
-  const [loadingTasks, setLoadingTasks] = useState(false);
   const [updatingTask, setUpdatingTask] = useState(false);
   const [creatingTask, setCreatingTask] = useState(false);
   const [deletingTask, setDeletingTask] = useState(false);
@@ -103,17 +147,116 @@ const TasksProvider = ({ children }: TasksContextProviderProps) => {
   const { showSnackbarError } = useAppSnackbar();
   const { user } = useUser();
 
+  const getTaskStatuses = useCallback(
+    async ({ room_id }: { room_id: string }) => {
+      try {
+        onSnapshot(
+          collection(db, "room", room_id, "task_status"),
+          (taskStatusDocs) => {
+            setTaskStatuses(
+              taskStatusDocs.docs.map(
+                (taskStatusDoc) => taskStatusDoc.data() as TaskStatusData
+              )
+            );
+          }
+        );
+      } catch (error) {
+        showSnackbarError(error);
+      }
+    },
+    [showSnackbarError]
+  );
+
+  const updateTaskStatus = useCallback(
+    async ({
+      room_id,
+      task_status_id,
+      updateData,
+    }: {
+      room_id: string;
+      task_status_id: string;
+      updateData: {
+        name?: string;
+        order?: number;
+      };
+    }) => {
+      try {
+        setUpdatingTaskStatus(true);
+        await updateDoc(
+          doc(db, "room", room_id, "task_status", task_status_id),
+          updateData
+        );
+      } catch (error) {
+        showSnackbarError(error);
+      } finally {
+        setUpdatingTaskStatus(false);
+      }
+    },
+    [showSnackbarError]
+  );
+
+  const createTaskStatus = useCallback(
+    async ({
+      room_id,
+      new_task_status,
+    }: {
+      room_id: string;
+      new_task_status: { name: string; order: number };
+    }) => {
+      try {
+        setCreatingTaskStatus(true);
+
+        const docResponse = await addDoc(
+          collection(db, "room", room_id, "task_status"),
+          new_task_status
+        );
+
+        await updateDoc(
+          doc(db, "room", room_id, "task_status", docResponse.id),
+          {
+            task_status_id: docResponse.id,
+          }
+        );
+      } catch (error) {
+        showSnackbarError(error);
+      } finally {
+        setCreatingTaskStatus(false);
+      }
+    },
+    [showSnackbarError]
+  );
+
+  const deleteTaskStatus = useCallback(
+    async ({
+      room_id,
+      task_status_id,
+    }: {
+      room_id: string;
+      task_status_id: string;
+    }) => {
+      try {
+        setDeletingTaskStatus(true);
+
+        await deleteDoc(
+          doc(db, "room", room_id, "task_status", task_status_id)
+        );
+      } catch (error) {
+        showSnackbarError(error);
+      } finally {
+        setDeletingTaskStatus(false);
+      }
+    },
+    [showSnackbarError]
+  );
+
   const getTasks = useCallback(
     async ({ room_id }: { room_id: string }) => {
       try {
-        setLoadingTasks(true);
         onSnapshot(collection(db, "room", room_id, "task"), (taskDocs) => {
           setTasks(taskDocs.docs.map((taskDoc) => taskDoc.data() as TaskData));
         });
       } catch (error) {
         showSnackbarError(error);
-      } finally {
-        setLoadingTasks(false);
       }
     },
     [showSnackbarError]
@@ -355,10 +498,21 @@ const TasksProvider = ({ children }: TasksContextProviderProps) => {
   return (
     <TasksContext.Provider
       value={{
-        tasks,
+        taskStatuses,
+        getTaskStatuses,
 
+        updateTaskStatus,
+        updatingTaskStatus,
+
+        createTaskStatus,
+        creatingTaskStatus,
+
+        deleteTaskStatus,
+        deletingTaskStatus,
+
+        tasks,
+        setTasks,
         getTasks,
-        loadingTasks,
 
         currentTask,
         setCurrentTask,

@@ -7,23 +7,29 @@ import TaskDetailDialog from "../../../../modules/task/components/TaskDetailDial
 import TaskList from "../../../../modules/task/components/TaskList/TaskList";
 import "react-perfect-scrollbar/dist/css/styles.css";
 import { useTasks } from "../../../../lib/provider/TasksProvider";
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, IconButton, Typography } from "@mui/material";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import { DragDropContext, DragStart, DropResult } from "react-beautiful-dnd";
 import CreateTaskDialog from "../../../../modules/task/components/CreateTaskDialog/CreateTaskDialog";
 import TaskHelper from "../../../../modules/task/util/task-helper";
 import ShowMenuButton from "../../../../lib/components/ShowMenuButton/ShowMenuButton";
+import { BiArrowFromLeft, BiArrowFromRight, BiPlus, BiX } from "react-icons/bi";
+import TaskStatusData from "../../../../modules/task/interface/task-status-data";
 
 const WorkPage = () => {
-  const [tasksToDo, setTasksToDo] = useState<TaskData[]>([]);
-  const [tasksDoing, setTasksDoing] = useState<TaskData[]>([]);
-  const [tasksDone, setTasksDone] = useState<TaskData[]>([]);
-  const [tasksReviewing, setTasksReviewing] = useState<TaskData[]>([]);
-
   const { getCurrentRoom, currentRoom } = useRooms();
   const { roomId } = useParams();
   const {
+    taskStatuses,
+    getTaskStatuses,
+    createTaskStatus,
+    deleteTaskStatus,
+    deletingTaskStatus,
+    updateTaskStatus,
+    updatingTaskStatus,
+
     tasks,
+    setTasks,
     getTasks,
     updateTask,
     updatingTask,
@@ -31,6 +37,7 @@ const WorkPage = () => {
     setCurrentTask,
   } = useTasks();
   const [openCreateTaskDialog, setOpenCreateTaskDialog] = useState(false);
+  const [hoverTitleTaskList, setHoverTitleTaskList] = useState("");
   const [isDraggingId, setIsDraggingId] = useState("-1");
 
   useEffect(() => {
@@ -40,6 +47,7 @@ const WorkPage = () => {
   useEffect(() => {
     if (currentRoom) {
       getTasks({ room_id: roomId || "" });
+      getTaskStatuses({ room_id: roomId || "" });
     }
   }, [currentRoom]);
 
@@ -50,132 +58,141 @@ const WorkPage = () => {
     return -1;
   };
 
-  useEffect(() => {
-    setTasksDoing(
-      tasks.filter((task) => task.status === "doing").sort(compareTasks)
-    );
-    setTasksToDo(
-      tasks.filter((task) => task.status === "toDo").sort(compareTasks)
-    );
-    setTasksDone(
-      tasks.filter((task) => task.status === "done").sort(compareTasks)
-    );
-    setTasksReviewing(
-      tasks.filter((task) => task.status === "reviewing").sort(compareTasks)
-    );
-  }, [tasks]);
-
   function handleOnDragStart(result: DragStart) {
-    if (result.source.droppableId === "doing") {
-      setIsDraggingId(tasksDoing[result.source.index].id);
-    } else if (result.source.droppableId === "toDo") {
-      setIsDraggingId(tasksToDo[result.source.index].id);
-    } else if (result.source.droppableId === "done") {
-      setIsDraggingId(tasksDone[result.source.index].id);
-    } else {
-      setIsDraggingId(tasksReviewing[result.source.index].id);
-    }
+    setIsDraggingId(tasks[result.source.index].id);
   }
 
   const handleOnDragEnd = async (result: DropResult) => {
     setIsDraggingId("-1");
-    if (updatingTask) {
-      return;
-    }
     if (!result.destination) return;
 
-    let dragTask;
-    if (result.source.droppableId === "toDo") {
-      dragTask = tasksToDo.at(result.source.index);
-      tasksToDo.splice(result.source.index, 1);
-      setTasksToDo(tasksToDo);
-    } else if (result.source.droppableId === "doing") {
-      dragTask = tasksDoing.at(result.source.index);
-      tasksDoing.splice(result.source.index, 1);
-      setTasksDoing(tasksDoing);
-    } else if (result.source.droppableId === "reviewing") {
-      dragTask = tasksReviewing.at(result.source.index);
-      tasksReviewing.splice(result.source.index, 1);
-      setTasksReviewing(tasksReviewing);
-    } else {
-      dragTask = tasksDone.at(result.source.index);
-      tasksDone.splice(result.source.index, 1);
-      setTasksDone(tasksDone);
-    }
+    const taskDestinitionList = tasks
+      .filter(
+        (task) =>
+          task.status ===
+          taskStatuses.find(
+            (status) =>
+              status.task_status_id === result.destination?.droppableId
+          )?.name
+      )
+      .sort(compareTasks);
 
-    if (result.destination.droppableId === "toDo") {
-      if (dragTask) {
-        tasksToDo.splice(result.destination.index, 0, dragTask);
-        setTasksToDo(tasksToDo);
-        await updateTask({
-          room_id: roomId ? roomId : "",
-          id: result.draggableId,
-          updateData: {
-            status: "toDo",
-            order_value: TaskHelper.getOrderString(
-              tasksToDo[tasksToDo.indexOf(dragTask) - 1]?.order_value ?? "",
-              tasksToDo[tasksToDo.indexOf(dragTask) + 1]?.order_value ?? ""
-            ),
-          },
-        });
-      }
-    } else if (result.destination.droppableId === "doing") {
-      if (dragTask) {
-        tasksDoing.splice(result.destination.index, 0, dragTask);
-        setTasksDoing(tasksDoing);
-        await updateTask({
-          room_id: roomId ? roomId : "",
-          id: result.draggableId,
-          updateData: {
-            status: "doing",
-            order_value: TaskHelper.getOrderString(
-              tasksDoing[tasksDoing.indexOf(dragTask) - 1]?.order_value ?? "",
-              tasksDoing[tasksDoing.indexOf(dragTask) + 1]?.order_value ?? ""
-            ),
-          },
-        });
-      }
-    } else if (result.destination.droppableId === "reviewing") {
-      if (dragTask) {
-        tasksReviewing.splice(result.destination.index, 0, dragTask);
-        setTasksReviewing(tasksReviewing);
-        await updateTask({
-          room_id: roomId ? roomId : "",
-          id: result.draggableId,
-          updateData: {
-            status: "reviewing",
-            order_value: TaskHelper.getOrderString(
-              tasksReviewing[tasksReviewing.indexOf(dragTask) - 1]
-                ?.order_value ?? "",
-              tasksReviewing[tasksReviewing.indexOf(dragTask) + 1]
-                ?.order_value ?? ""
-            ),
-          },
-        });
-      }
-    } else if (result.destination.droppableId === "done") {
-      if (dragTask) {
-        tasksDone.splice(result.destination.index, 0, dragTask);
-        setTasksDone(tasksDone);
-        await updateTask({
-          room_id: roomId ? roomId : "",
-          id: result.draggableId,
-          updateData: {
-            status: "done",
-            order_value: TaskHelper.getOrderString(
-              tasksDone[tasksDone.indexOf(dragTask) - 1]?.order_value ?? "",
-              tasksDone[tasksDone.indexOf(dragTask) + 1]?.order_value ?? ""
-            ),
-          },
-        });
-      }
-    }
+    const updateData = {
+      status:
+        taskStatuses.find(
+          (status) => status.task_status_id === result.destination?.droppableId
+        )?.name || "",
+      order_value: TaskHelper.getOrderString(
+        taskDestinitionList[result.destination.index - 1]?.order_value ?? "",
+        taskDestinitionList[result.destination.index + 1]?.order_value ?? ""
+      ),
+    };
+
+    setTasks(tasks.filter((task) => task.id !== result.draggableId));
+
+    await updateTask({
+      room_id: roomId ? roomId : "",
+      id: result.draggableId,
+      updateData: updateData,
+    });
+
+    // if (result.source.droppableId === "toDo") {
+    //   dragTask = tasksToDo.at(result.source.index);
+    //   tasksToDo.splice(result.source.index, 1);
+    //   setTasksToDo(tasksToDo);
+    // } else if (result.source.droppableId === "doing") {
+    //   dragTask = tasksDoing.at(result.source.index);
+    //   tasksDoing.splice(result.source.index, 1);
+    //   setTasksDoing(tasksDoing);
+    // } else if (result.source.droppableId === "reviewing") {
+    //   dragTask = tasksReviewing.at(result.source.index);
+    //   tasksReviewing.splice(result.source.index, 1);
+    //   setTasksReviewing(tasksReviewing);
+    // } else {
+    //   dragTask = tasksDone.at(result.source.index);
+    //   tasksDone.splice(result.source.index, 1);
+    //   setTasksDone(tasksDone);
+    // }
+
+    // if (result.destination.droppableId === "toDo") {
+    //   if (dragTask) {
+    //     tasksToDo.splice(result.destination.index, 0, dragTask);
+    //     setTasksToDo(tasksToDo);
+    //     await updateTask({
+    //       room_id: roomId ? roomId : "",
+    //       id: result.draggableId,
+    //       updateData: {
+    //         status: "toDo",
+    //         order_value: TaskHelper.getOrderString(
+    //           tasksToDo[tasksToDo.indexOf(dragTask) - 1]?.order_value ?? "",
+    //           tasksToDo[tasksToDo.indexOf(dragTask) + 1]?.order_value ?? ""
+    //         ),
+    //       },
+    //     });
+    //   }
+    // } else if (result.destination.droppableId === "doing") {
+    //   if (dragTask) {
+    //     tasksDoing.splice(result.destination.index, 0, dragTask);
+    //     setTasksDoing(tasksDoing);
+    //     await updateTask({
+    //       room_id: roomId ? roomId : "",
+    //       id: result.draggableId,
+    //       updateData: {
+    //         status: "doing",
+    //         order_value: TaskHelper.getOrderString(
+    //           tasksDoing[tasksDoing.indexOf(dragTask) - 1]?.order_value ?? "",
+    //           tasksDoing[tasksDoing.indexOf(dragTask) + 1]?.order_value ?? ""
+    //         ),
+    //       },
+    //     });
+    //   }
+    // } else if (result.destination.droppableId === "reviewing") {
+    //   if (dragTask) {
+    //     tasksReviewing.splice(result.destination.index, 0, dragTask);
+    //     setTasksReviewing(tasksReviewing);
+    //     await updateTask({
+    //       room_id: roomId ? roomId : "",
+    //       id: result.draggableId,
+    //       updateData: {
+    //         status: "reviewing",
+    //         order_value: TaskHelper.getOrderString(
+    //           tasksReviewing[tasksReviewing.indexOf(dragTask) - 1]
+    //             ?.order_value ?? "",
+    //           tasksReviewing[tasksReviewing.indexOf(dragTask) + 1]
+    //             ?.order_value ?? ""
+    //         ),
+    //       },
+    //     });
+    //   }
+    // } else if (result.destination.droppableId === "done") {
+    //   if (dragTask) {
+    //     tasksDone.splice(result.destination.index, 0, dragTask);
+    //     setTasksDone(tasksDone);
+    //     await updateTask({
+    //       room_id: roomId ? roomId : "",
+    //       id: result.draggableId,
+    //       updateData: {
+    //         status: "done",
+    //         order_value: TaskHelper.getOrderString(
+    //           tasksDone[tasksDone.indexOf(dragTask) - 1]?.order_value ?? "",
+    //           tasksDone[tasksDone.indexOf(dragTask) + 1]?.order_value ?? ""
+    //         ),
+    //       },
+    //     });
+    //   }
+    // }
   };
 
   return (
     <>
       <LeftSideBar>
-        <Box style={{ display: "flex", flexDirection: "column" }}>
+        <Box
+          style={{
+            display: "flex",
+            height: "calc(100vh - 66px)",
+            flexDirection: "column",
+          }}
+        >
           <Box style={{ display: "flex", justifyContent: "space-between" }}>
             <Button
               variant="contained"
@@ -209,139 +226,170 @@ const WorkPage = () => {
             </Box>
           </Box>
 
-          <Box
+          <PerfectScrollbar
             style={{
               marginTop: 16,
               marginLeft: 8,
-              maxHeight: 700,
+              display: "flex",
             }}
           >
-            <DragDropContext
-              onDragEnd={handleOnDragEnd}
-              onDragStart={handleOnDragStart}
+            <Box
+              style={{
+                maxHeight: 560,
+                display: "flex",
+              }}
             >
-              <PerfectScrollbar>
-                <Box style={{ display: "flex" }}>
-                  <PerfectScrollbar
-                    style={{
-                      background: "#f1f3f9",
-                      marginRight: 12,
-                      width: 300,
-                      maxHeight: 700,
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Typography
+              <DragDropContext
+                onDragEnd={handleOnDragEnd}
+                onDragStart={handleOnDragStart}
+              >
+                {taskStatuses
+                  .sort((statusA: TaskStatusData, statusB: TaskStatusData) =>
+                    statusA.order < statusB.order ? -1 : 1
+                  )
+                  .map((taskStatus, index) => (
+                    <PerfectScrollbar
                       style={{
-                        marginTop: 8,
-                        fontSize: 18,
-                        textDecoration: "underline",
-                        marginBottom: 12,
+                        background: "#f1f3f9",
+                        marginRight: 12,
+                        width: 300,
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
                       }}
                     >
-                      Chưa làm
-                    </Typography>
-                    <TaskList
-                      curTaskList={tasksToDo}
-                      status={"toDo"}
-                      type={"card"}
-                      isDragging={isDraggingId}
-                    />
-                  </PerfectScrollbar>
+                      <Box
+                        onMouseEnter={() =>
+                          setHoverTitleTaskList(taskStatus.task_status_id)
+                        }
+                        onMouseLeave={() => setHoverTitleTaskList("")}
+                        style={{
+                          width: "100%",
+                          height: 52,
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
+                        {hoverTitleTaskList === taskStatus.task_status_id && (
+                          <Box
+                            style={{
+                              position: "absolute",
+                              left: 0,
+                              display: "flex",
+                            }}
+                          >
+                            <IconButton
+                              disabled={index === 0}
+                              onClick={async () =>
+                                await Promise.all([
+                                  updateTaskStatus({
+                                    room_id: roomId ?? "",
+                                    task_status_id: taskStatus.task_status_id,
+                                    updateData: { order: taskStatus.order - 1 },
+                                  }),
+                                  updateTaskStatus({
+                                    room_id: roomId ?? "",
+                                    task_status_id:
+                                      taskStatuses[index - 1].task_status_id,
+                                    updateData: {
+                                      order: taskStatuses[index - 1].order + 1,
+                                    },
+                                  }),
+                                ])
+                              }
+                            >
+                              <BiArrowFromRight />
+                            </IconButton>
 
-                  <PerfectScrollbar
-                    style={{
-                      background: "#f1f3f9",
-                      width: 300,
-                      maxHeight: 700,
-                      display: "flex",
-                      marginRight: 12,
-                      flexDirection: "column",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Typography
-                      style={{
-                        marginTop: 8,
-                        fontSize: 18,
-                        textDecoration: "underline",
-                        marginBottom: 12,
-                      }}
-                    >
-                      Đang làm
-                    </Typography>
-                    <TaskList
-                      curTaskList={tasksDoing}
-                      status={"doing"}
-                      type={"card"}
-                      isDragging={isDraggingId}
-                    />
-                  </PerfectScrollbar>
+                            <IconButton
+                              disabled={index === taskStatuses.length - 1}
+                              onClick={async () =>
+                                await Promise.all([
+                                  updateTaskStatus({
+                                    room_id: roomId ?? "",
+                                    task_status_id: taskStatus.task_status_id,
+                                    updateData: { order: taskStatus.order + 1 },
+                                  }),
+                                  updateTaskStatus({
+                                    room_id: roomId ?? "",
+                                    task_status_id:
+                                      taskStatuses[index + 1].task_status_id,
+                                    updateData: {
+                                      order: taskStatuses[index + 1].order - 1,
+                                    },
+                                  }),
+                                ])
+                              }
+                            >
+                              <BiArrowFromLeft />
+                            </IconButton>
+                          </Box>
+                        )}
+                        <Typography
+                          style={{
+                            fontSize: 18,
+                            textDecoration: "underline",
+                            cursor:
+                              hoverTitleTaskList === taskStatus.task_status_id
+                                ? "pointer"
+                                : "default",
+                          }}
+                        >
+                          {taskStatus.name}
+                        </Typography>
 
-                  <PerfectScrollbar
-                    style={{
-                      width: 300,
-                      background: "#f1f3f9",
-                      maxHeight: 700,
-                      marginRight: 12,
-                      display: "flex",
-                      overflowY: "scroll",
-                      flexDirection: "column",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Typography
-                      style={{
-                        marginTop: 8,
-                        fontSize: 18,
-                        textDecoration: "underline",
-                        marginBottom: 12,
-                      }}
-                    >
-                      Chờ duyệt
-                    </Typography>
-                    <TaskList
-                      curTaskList={tasksReviewing}
-                      status={"reviewing"}
-                      type={"card"}
-                      isDragging={isDraggingId}
-                    />
-                  </PerfectScrollbar>
-
-                  <PerfectScrollbar
-                    style={{
-                      width: 300,
-                      background: "#f1f3f9",
-                      maxHeight: 700,
-                      display: "flex",
-                      overflowY: "scroll",
-                      flexDirection: "column",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Typography
-                      style={{
-                        marginTop: 8,
-                        fontSize: 18,
-                        textDecoration: "underline",
-                        marginBottom: 12,
-                      }}
-                    >
-                      Hoàn thành
-                    </Typography>
-                    <TaskList
-                      curTaskList={tasksDone}
-                      status={"done"}
-                      type={"card"}
-                      isDragging={isDraggingId}
-                    />
-                  </PerfectScrollbar>
+                        {hoverTitleTaskList === taskStatus.task_status_id && (
+                          <IconButton
+                            style={{ position: "absolute", right: 0 }}
+                            onClick={async () =>
+                              await deleteTaskStatus({
+                                room_id: roomId ?? "",
+                                task_status_id: taskStatus.task_status_id,
+                              })
+                            }
+                          >
+                            <BiX />
+                          </IconButton>
+                        )}
+                      </Box>
+                      <TaskList
+                        curTaskList={tasks
+                          .filter((task) => task.status === taskStatus.name)
+                          .sort(compareTasks)}
+                        status={taskStatus.task_status_id}
+                        type={"card"}
+                        isDragging={isDraggingId}
+                      />
+                    </PerfectScrollbar>
+                  ))}
+                <Box
+                  style={{
+                    height: 24,
+                    width: 24,
+                    borderRadius: 8,
+                    background: "#d8f9ff",
+                    cursor: "pointer",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                  onClick={async () =>
+                    await createTaskStatus({
+                      room_id: roomId ?? "",
+                      new_task_status: {
+                        name: "Process " + (taskStatuses.length + 1),
+                        order: taskStatuses.length,
+                      },
+                    })
+                  }
+                >
+                  <BiPlus />
                 </Box>
-              </PerfectScrollbar>
-            </DragDropContext>
-          </Box>
+                <Box style={{ width: 12 }} />
+              </DragDropContext>
+            </Box>
+          </PerfectScrollbar>
         </Box>
       </LeftSideBar>
 
