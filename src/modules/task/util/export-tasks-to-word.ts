@@ -3,7 +3,7 @@ const PizZip = require("pizzip");
 const Docxtemplater = require("docxtemplater");
 
 const exportTasksToWord = async () => {
-  const response = await fetch("tag-example.docx");
+  const response = await fetch("documents/docx/tasks_report.docx");
   const content = await response.arrayBuffer();
   const zip = new PizZip(content);
 
@@ -25,6 +25,7 @@ const exportTasksToWord = async () => {
   });
 
   saveAs(buf, "output.docx");
+    
 };
 
 export default exportTasksToWord;

@@ -13,7 +13,7 @@ import { DragDropContext, DragStart, DropResult } from "react-beautiful-dnd";
 import CreateTaskDialog from "../../../../modules/task/components/CreateTaskDialog/CreateTaskDialog";
 import TaskHelper from "../../../../modules/task/util/task-helper";
 import ShowMenuButton from "../../../../lib/components/ShowMenuButton/ShowMenuButton";
-import exportTasksToWord from "./export-tasks-to-word";
+import exportTasksToWord from "../../../../modules/task/util/export-tasks-to-word";
 
 const WorkPage = () => {
   const [tasksToDo, setTasksToDo] = useState<TaskData[]>([]);
