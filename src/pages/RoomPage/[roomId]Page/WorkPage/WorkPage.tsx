@@ -13,6 +13,7 @@ import { DragDropContext, DragStart, DropResult } from "react-beautiful-dnd";
 import CreateTaskDialog from "../../../../modules/task/components/CreateTaskDialog/CreateTaskDialog";
 import TaskHelper from "../../../../modules/task/util/task-helper";
 import ShowMenuButton from "../../../../lib/components/ShowMenuButton/ShowMenuButton";
+import exportTasksToWord from "./export-tasks-to-word";
 
 const WorkPage = () => {
   const [tasksToDo, setTasksToDo] = useState<TaskData[]>([]);
@@ -203,7 +204,13 @@ const WorkPage = () => {
               <ShowMenuButton
                 title="Xuất"
                 itemsTitle={["Xuất Word", "Xuất HTML", "Xuất CSV"]}
-                itemsAction={[() => {}, () => {}, () => {}]}
+                itemsAction={[
+                  () => {
+                    exportTasksToWord();
+                  },
+                  () => {},
+                  () => {},
+                ]}
                 tooltipTitle="Xuất tất cả công việc"
               />
             </Box>
