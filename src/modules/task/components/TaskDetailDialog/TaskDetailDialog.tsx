@@ -120,7 +120,10 @@ const useStyle = makeStyles((theme) => ({
   },
 }));
 
-const TaskDetailDialog = ({ task, open, onClose }: TaskDetailDialogProps) => {
+const TaskDetailDialog = ({
+  task,
+  ...dialogProps
+}: TaskDetailDialogProps & DialogProps) => {
   const emptyTask = {
     id: "",
     title: "",
@@ -171,7 +174,12 @@ const TaskDetailDialog = ({ task, open, onClose }: TaskDetailDialogProps) => {
   }, [task]);
 
   return (
-    <Dialog open={open} fullScreen={fullScreen} fullWidth={true} maxWidth="lg">
+    <Dialog
+      fullScreen={fullScreen}
+      fullWidth={true}
+      maxWidth="lg"
+      {...dialogProps}
+    >
       <Box className={classes.dialog}>
         {/* Header of the dialog */}
         <Box className={classes.dialog_header}>
@@ -260,7 +268,7 @@ const TaskDetailDialog = ({ task, open, onClose }: TaskDetailDialogProps) => {
               TransitionComponent={Fade}
               arrow
               onClick={() => {
-                onClose?.();
+                dialogProps.onClose?.();
                 setEditTask({ ...emptyTask });
                 setVoted(false);
                 setWatches(false);
@@ -579,8 +587,8 @@ const TaskDetailDialog = ({ task, open, onClose }: TaskDetailDialogProps) => {
                     <TableCell>
                       <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
-                          value={task?.deadline || null}
-                          inputFormat="DD/MM/YYYY"
+                          value={(task?.deadline as Timestamp) || null}
+                          inputFormat={"DD/MM/YYYY"}
                           onChange={async (newValue: Timestamp | null) => {
                             if (
                               !newValue ||
@@ -692,7 +700,7 @@ const TaskDetailDialog = ({ task, open, onClose }: TaskDetailDialogProps) => {
                   id: task?.id || "",
                 });
                 setCurrentTask(undefined);
-                onClose?.();
+                dialogProps.onClose?.();
               },
             });
           }}
