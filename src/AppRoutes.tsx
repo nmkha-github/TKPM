@@ -10,6 +10,7 @@ import NewsfeedPage from "./pages/RoomPage/[roomId]Page/NewsfeedPage/NewsfeedPag
 import SettingRoomPage from "./pages/RoomPage/[roomId]Page/SettingRoomPage/SettingRoomPage";
 import WorkPage from "./pages/RoomPage/[roomId]Page/WorkPage/WorkPage";
 import EmptyPage from "./pages/EmptyPage/EmptyPage";
+import SchedulePage from "./pages/SchedulePage/SchedulePage";
 
 const AppRoutes = () => {
   return (
@@ -28,6 +29,7 @@ const AppRoutes = () => {
       <Route path="room/:roomId/member" element={<MembersPage />} />
       <Route path="room/:roomId/work" element={<WorkPage />} />
       <Route path="room/:roomId/setting-room" element={<SettingRoomPage />} />
+      <Route path="schedule" element={<SchedulePage />} />
       <Route path="*" element={<EmptyPage />} />
     </Routes>
   );
