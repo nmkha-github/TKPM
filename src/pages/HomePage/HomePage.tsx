@@ -29,7 +29,7 @@ const HomePage = () => {
             }}
             variant="h4"
           >
-            TRANSFORMER
+            E-WorkRoom
           </Typography>
 
           <Box
@@ -73,12 +73,9 @@ const HomePage = () => {
                       Giới thiệu
                     </Typography>
                     <Typography>
-                      Transformer là một mô hình đã tạo nên bước ngoặt lớn trong
-                      việc xử lý ngôn ngữ tự nhiên ban đầu và được sử dụng rộng
-                      rãi ngày nay mô hình RoBERTa (Robustly Optimized BERT
-                      Approach), ra đời năm 2019 bởi Facebook AI , một mô hình
-                      được tối ưu dựa trên mô hình BERT được ra đời năm 2018 bởi
-                      Google.
+                      Đồ án môn học Thiết kế phần mềm - FIT HCMUS. Sử dụng
+                      ReactJS cùng với Firebase để thiết kế trang web có công
+                      dụng tương tự như Jira và Trello.
                     </Typography>
                   </Box>
                 </Box>
@@ -100,7 +97,7 @@ const HomePage = () => {
               }}
               onClick={() => navigate("/login")}
             >
-              Bắt Đầu
+              Login
             </motion.button>
           </Box>
         </Box>
@@ -133,10 +130,12 @@ const HomePage = () => {
               }}
             >
               <Typography variant="h3" fontWeight="bold">
-                Question Answering With Transformer
+                Work together
+                <br />
+                Work easily!
               </Typography>
               <Typography variant="h5" color="rgba(255, 255, 255, 0.6)">
-                Mô hình RoBERTa
+                Web app for teamwork
               </Typography>
 
               <Box
@@ -164,7 +163,7 @@ const HomePage = () => {
                       )
                     }
                   >
-                    Xem Demo
+                    Watch Demo
                   </motion.button>
                 </Box>
               </Box>
@@ -185,7 +184,7 @@ const HomePage = () => {
                   }}
                   onClick={() => navigate("/login")}
                 >
-                  Bắt Đầu Ngay
+                  Start now
                 </motion.button>
               </Box>
             </Box>
