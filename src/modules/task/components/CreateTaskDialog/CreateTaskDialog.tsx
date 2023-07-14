@@ -42,7 +42,7 @@ const useStyle = makeStyles((theme) => ({
 
 const CreateTaskDialog = ({ ...dialogProps }: DialogProps) => {
   const { roomId } = useParams();
-  const { createTask, creatingTask } = useTasks();
+  const { taskStatuses, createTask, creatingTask } = useTasks();
   const { logOut } = useAuth();
   const { user } = useUser();
 
@@ -90,7 +90,7 @@ const CreateTaskDialog = ({ ...dialogProps }: DialogProps) => {
           required
           fullWidth
           error={newTask.title.length > 100}
-          helperText={!newTask.title.length ? 'Không hợp lệ' : ''}
+          helperText={!newTask.title.length ? "Không hợp lệ" : ""}
           value={newTask.title}
           onChange={(event) =>
             setNewTask({ ...newTask, title: event.target.value })
@@ -173,6 +173,7 @@ const CreateTaskDialog = ({ ...dialogProps }: DialogProps) => {
                 content: newTask.content,
                 assignee_id: newTask.assignee_id,
                 attach_files: newTask.attach_files,
+                status: taskStatuses[0].name,
               },
             });
             dialogProps.onClose?.({}, "backdropClick");
@@ -182,7 +183,9 @@ const CreateTaskDialog = ({ ...dialogProps }: DialogProps) => {
           color="primary"
           loading={creatingTask}
           style={{ padding: 8 }}
-          disabled={newTask.title === "" || creatingTask || newTask.title.length >= 100 }
+          disabled={
+            newTask.title === "" || creatingTask || newTask.title.length >= 100
+          }
         >
           TẠO
         </LoadingButton>
