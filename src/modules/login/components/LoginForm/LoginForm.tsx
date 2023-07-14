@@ -22,7 +22,10 @@ const LoginForm = () => {
   return (
     <div className="flex min-h-full items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8">
-        <div className="lg:shadow-2xl rounded px-8 pt-6 pb-8 mb-4 flex flex-col">
+        <div
+          className="lg:shadow-2xl rounded px-8 pt-6 pb-8 mb-4 flex flex-col"
+          style={{ background: "white" }}
+        >
           <div className="mt-8 space-y-6">
             <h2 className="mt-6 text-left text-3xl font-medium tracking-tight text-gray-900">
               Đăng nhập vào tài khoản

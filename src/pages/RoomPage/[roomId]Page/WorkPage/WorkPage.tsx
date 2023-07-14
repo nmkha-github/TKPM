@@ -13,6 +13,7 @@ import { DragDropContext, DragStart, DropResult } from "react-beautiful-dnd";
 import CreateTaskDialog from "../../../../modules/task/components/CreateTaskDialog/CreateTaskDialog";
 import TaskHelper from "../../../../modules/task/util/task-helper";
 import ShowMenuButton from "../../../../lib/components/ShowMenuButton/ShowMenuButton";
+import exportTasksToWord from "../../../../modules/task/util/export-tasks-to-word";
 import { BiArrowFromLeft, BiArrowFromRight, BiPlus, BiX } from "react-icons/bi";
 import TaskStatusData from "../../../../modules/task/interface/task-status-data";
 
@@ -220,7 +221,28 @@ const WorkPage = () => {
               <ShowMenuButton
                 title="Xuất"
                 itemsTitle={["Xuất Word", "Xuất HTML", "Xuất CSV"]}
-                itemsAction={[() => {}, () => {}, () => {}]}
+                itemsAction={[
+                  () => {
+                    const data = {
+                      tasks: tasks.map((task) => ({
+                        title: task.title,
+                        content: task.content || "",
+                        status: task.status,
+                        assignee_id: task.assignee_id,
+                        creator_id: task.creator_id,
+                        created_at: task.created_at,
+                        deadline: task.deadline || "",
+                        last_edit: task.last_edit || "",
+                        room: "TODO",
+                      })),
+                    };
+                    exportTasksToWord(data);
+                  },
+                  () => {
+                    console.log(tasks);
+                  },
+                  () => {},
+                ]}
                 tooltipTitle="Xuất tất cả công việc"
               />
             </Box>
