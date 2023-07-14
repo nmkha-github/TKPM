@@ -43,7 +43,7 @@ const WorkPage = () => {
   const [openCreateTaskDialog, setOpenCreateTaskDialog] = useState(false);
   const [hoverTitleTaskList, setHoverTitleTaskList] = useState("");
   const [showInputDialog, setShowInputDialog] = useState("");
-  const [editTaskStatusId, setEditTaskStatusId] = useState("");
+  const [editTaskStatus, setEditTaskStatus] = useState<TaskStatusData>();
   const [isDraggingId, setIsDraggingId] = useState("-1");
 
   useEffect(() => {
@@ -374,7 +374,7 @@ const WorkPage = () => {
                             }}
                             onClick={() => {
                               setShowInputDialog("change_title_status");
-                              setEditTaskStatusId(taskStatus.task_status_id);
+                              setEditTaskStatus(taskStatus);
                             }}
                           >
                             {truncate(taskStatus.name, 15)}
@@ -447,51 +447,54 @@ const WorkPage = () => {
         />
       )}
 
-      <InputDialog
-        open={!!showInputDialog}
-        style={{ minWidth: 400 }}
-        title={
-          showInputDialog === "create_status"
-            ? "Tạo trạng thái công việc"
-            : "Thay đổi tên trạng thái công việc"
-        }
-        placeholder="Nhập tên trạng thái..."
-        inputErrorText="Tên trạng thái không được trùng"
-        onClose={() => setShowInputDialog("")}
-        showError={(text) =>
-          taskStatuses.map((status) => status.name).includes(text)
-        }
-        onConfirm={async (text) => {
-          if (showInputDialog === "create_status") {
-            await createTaskStatus({
-              room_id: roomId ?? "",
-              new_task_status: {
-                name: !!text
-                  ? text
-                  : Math.random().toString(36).substring(2, 12),
-                order: taskStatuses?.length,
-              },
-            });
-          } else {
-            await Promise.all([
-              updateTaskStatus({
-                room_id: roomId ?? "",
-                task_status_id: editTaskStatusId,
-                updateData: {
-                  name: text,
-                },
-              }),
-              ...tasks.map((task) =>
-                updateTask({
-                  room_id: roomId ?? "",
-                  id: task.id,
-                  updateData: { status: text },
-                })
-              ),
-            ]);
+      {!!showInputDialog && (
+        <InputDialog
+          open={!!showInputDialog}
+          style={{ minWidth: 400 }}
+          title={
+            showInputDialog === "create_status"
+              ? "Tạo trạng thái công việc"
+              : "Thay đổi tên trạng thái công việc"
           }
-        }}
-      />
+          initInputText={editTaskStatus?.name}
+          placeholder="Nhập tên trạng thái..."
+          inputErrorText="Tên trạng thái không được trùng"
+          onClose={() => setShowInputDialog("")}
+          showError={(text) =>
+            taskStatuses.map((status) => status.name).includes(text)
+          }
+          onConfirm={async (text) => {
+            if (showInputDialog === "create_status") {
+              await createTaskStatus({
+                room_id: roomId ?? "",
+                new_task_status: {
+                  name: !!text
+                    ? text
+                    : Math.random().toString(36).substring(2, 12),
+                  order: taskStatuses?.length,
+                },
+              });
+            } else {
+              await Promise.all([
+                updateTaskStatus({
+                  room_id: roomId ?? "",
+                  task_status_id: editTaskStatus?.task_status_id || "",
+                  updateData: {
+                    name: text,
+                  },
+                }),
+                ...tasks.map((task) =>
+                  updateTask({
+                    room_id: roomId ?? "",
+                    id: task.id,
+                    updateData: { status: text },
+                  })
+                ),
+              ]);
+            }
+          }}
+        />
+      )}
     </>
   );
 };

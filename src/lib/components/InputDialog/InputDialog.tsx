@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 interface InputDialogProps {
   title: string;
   inputSize?: "small" | "medium";
+  initInputText?: string;
   placeholder?: string;
   confirmText?: string;
   onConfirm?: (inputText: string) => void;
@@ -22,6 +23,7 @@ interface InputDialogProps {
 const InputDialog = ({
   title,
   inputSize,
+  initInputText,
   placeholder,
   confirmText,
   onConfirm,
@@ -30,7 +32,7 @@ const InputDialog = ({
   showError,
   ...dialogProps
 }: InputDialogProps & DialogProps) => {
-  const [text, setText] = useState("");
+  const [text, setText] = useState(initInputText || "");
   const [isError, setIsError] = useState(false);
 
   return (
@@ -49,6 +51,7 @@ const InputDialog = ({
         </Box>
 
         <TextField
+          value={text}
           fullWidth
           placeholder={placeholder}
           error={isError}
