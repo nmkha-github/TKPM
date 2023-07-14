@@ -17,6 +17,7 @@ import exportTasksToWord from "../../../../modules/task/util/export-tasks-to-wor
 import { BiArrowFromLeft, BiArrowFromRight, BiPlus, BiX } from "react-icons/bi";
 import TaskStatusData from "../../../../modules/task/interface/task-status-data";
 import truncate from "../../../../lib/util/truncate";
+import InputDialog from "../../../../lib/components/InputDialog/InputDialog";
 
 const WorkPage = () => {
   const { getCurrentRoom, currentRoom } = useRooms();
@@ -41,6 +42,8 @@ const WorkPage = () => {
   } = useTasks();
   const [openCreateTaskDialog, setOpenCreateTaskDialog] = useState(false);
   const [hoverTitleTaskList, setHoverTitleTaskList] = useState("");
+  const [showInputDialog, setShowInputDialog] = useState("");
+  const [editTaskStatusId, setEditTaskStatusId] = useState("");
   const [isDraggingId, setIsDraggingId] = useState("-1");
 
   useEffect(() => {
@@ -369,6 +372,10 @@ const WorkPage = () => {
                                   ? "pointer"
                                   : "default",
                             }}
+                            onClick={() => {
+                              setShowInputDialog("change_title_status");
+                              setEditTaskStatusId(taskStatus.task_status_id);
+                            }}
                           >
                             {truncate(taskStatus.name, 15)}
                           </Typography>
@@ -421,15 +428,7 @@ const WorkPage = () => {
                     justifyContent: "center",
                     alignItems: "center",
                   }}
-                  onClick={async () =>
-                    await createTaskStatus({
-                      room_id: roomId ?? "",
-                      new_task_status: {
-                        name: "Process " + (taskStatuses?.length + 1),
-                        order: taskStatuses?.length,
-                      },
-                    })
-                  }
+                  onClick={async () => setShowInputDialog("create_status")}
                 >
                   <BiPlus />
                 </Box>
@@ -447,6 +446,52 @@ const WorkPage = () => {
           onClose={() => setCurrentTask(undefined)}
         />
       )}
+
+      <InputDialog
+        open={!!showInputDialog}
+        style={{ minWidth: 400 }}
+        title={
+          showInputDialog === "create_status"
+            ? "Tạo trạng thái công việc"
+            : "Thay đổi tên trạng thái công việc"
+        }
+        placeholder="Nhập tên trạng thái..."
+        inputErrorText="Tên trạng thái không được trùng"
+        onClose={() => setShowInputDialog("")}
+        showError={(text) =>
+          taskStatuses.map((status) => status.name).includes(text)
+        }
+        onConfirm={async (text) => {
+          if (showInputDialog === "create_status") {
+            await createTaskStatus({
+              room_id: roomId ?? "",
+              new_task_status: {
+                name: !!text
+                  ? text
+                  : Math.random().toString(36).substring(2, 12),
+                order: taskStatuses?.length,
+              },
+            });
+          } else {
+            await Promise.all([
+              updateTaskStatus({
+                room_id: roomId ?? "",
+                task_status_id: editTaskStatusId,
+                updateData: {
+                  name: text,
+                },
+              }),
+              ...tasks.map((task) =>
+                updateTask({
+                  room_id: roomId ?? "",
+                  id: task.id,
+                  updateData: { status: text },
+                })
+              ),
+            ]);
+          }
+        }}
+      />
     </>
   );
 };
