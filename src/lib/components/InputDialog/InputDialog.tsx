@@ -76,10 +76,10 @@ const InputDialog = ({
               if (!showError?.(text)) {
                 setIsError(false);
                 onConfirm?.(text);
+                dialogProps.onClose?.({}, "backdropClick");
               } else {
                 setIsError(true);
               }
-              dialogProps.onClose?.({}, "backdropClick");
             }}
           >
             <Typography fontWeight={"bold"}>
