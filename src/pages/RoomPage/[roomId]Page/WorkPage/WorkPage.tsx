@@ -207,6 +207,8 @@ const WorkPage = () => {
                 itemsAction={[
                   () => {
                     const data = {
+                      has_cover_page: false,
+                      company_name: "ABC Company",
                       tasks: tasks.map((task) => ({
                         title: task.title,
                         content: task.content || "",
