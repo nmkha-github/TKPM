@@ -206,9 +206,24 @@ const WorkPage = () => {
                 itemsTitle={["Xuất Word", "Xuất HTML", "Xuất CSV"]}
                 itemsAction={[
                   () => {
-                    exportTasksToWord();
+                    const data = {
+                      tasks: tasks.map((task) => ({
+                        title: task.title,
+                        content: task.content || "",
+                        status: task.status,
+                        assignee_id: task.assignee_id,
+                        creator_id: task.creator_id,
+                        created_at: task.created_at,
+                        deadline: task.deadline || "",
+                        last_edit: task.last_edit || "",
+                        room: "TODO",
+                      })),
+                    };
+                    exportTasksToWord(data);
                   },
-                  () => {},
+                  () => {
+                    console.log(tasks);
+                  },
                   () => {},
                 ]}
                 tooltipTitle="Xuất tất cả công việc"
