@@ -44,25 +44,6 @@ import moment from "moment";
 import { useTasks } from "../../lib/provider/TasksProvider";
 import { unionTypeAnnotation } from "@babel/types";
 import { Timestamp } from "@firebase/firestore";
-const events = [
-  {
-    title: "All Day Event very long title",
-    allDay: true,
-    start: new Date(2023, 7, 7),
-    end: new Date(2023, 7, 7),
-  },
-  {
-    title: "Long Event",
-    start: new Date(2023, 3, 7),
-    end: new Date(2023, 3, 10),
-  },
-
-  {
-    title: "DTS STARTS",
-    start: new Date(2016, 2, 13, 0, 0, 0),
-    end: new Date(2016, 2, 20, 0, 0, 0),
-  },
-];
 interface Event {
   id: string;
   title: string;
@@ -72,7 +53,7 @@ interface Event {
 
 type SomeAreRequired<T, K extends keyof T> = Required<Pick<T, K>> & Omit<T, K>;
 type TaskWithDeadline = SomeAreRequired<TaskData, "deadline">;
-const localizer = momentLocalizer(moment);
+const localizer = momentLocalizer(moment); 
 const DragAndDropCalendar = withDragAndDrop(Calendar);
 const SchedulePage = () => {
   const [myEvents, setMyEvents] = useState<any[]>([]);
@@ -100,7 +81,7 @@ const SchedulePage = () => {
   useEffect(() => {
     const ids = TotalTasks.map(({ id }) => id);
     setMyEvents(
-      TotalTasks.filter((task): task is TaskDataDeadline => !!task.deadline)
+      tasks.filter((task): task is TaskDataDeadline => !!task.deadline)
         .filter(({ id }, index) => !ids.includes(id, index + 1))
         .map((task) => ({
           id: task.id,
