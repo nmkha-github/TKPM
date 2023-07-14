@@ -16,6 +16,7 @@ import ShowMenuButton from "../../../../lib/components/ShowMenuButton/ShowMenuBu
 import exportTasksToWord from "../../../../modules/task/util/export-tasks-to-word";
 import { BiArrowFromLeft, BiArrowFromRight, BiPlus, BiX } from "react-icons/bi";
 import TaskStatusData from "../../../../modules/task/interface/task-status-data";
+import truncate from "../../../../lib/util/truncate";
 
 const WorkPage = () => {
   const { getCurrentRoom, currentRoom } = useRooms();
@@ -33,6 +34,7 @@ const WorkPage = () => {
     setTasks,
     getTasks,
     updateTask,
+    deleteTask,
     updatingTask,
     currentTask,
     setCurrentTask,
@@ -89,7 +91,9 @@ const WorkPage = () => {
       ),
     };
 
-    setTasks(tasks.filter((task) => task.id !== result.draggableId));
+    // setTasks(tasks.filter((task) => task.id !== result.draggableId));
+    console.log(taskDestinitionList);
+    console.log(result.destination.index);
 
     await updateTask({
       room_id: roomId ? roomId : "",
@@ -325,7 +329,7 @@ const WorkPage = () => {
                             </IconButton>
 
                             <IconButton
-                              disabled={index === taskStatuses.length - 1}
+                              disabled={index === taskStatuses?.length - 1}
                               onClick={async () =>
                                 await Promise.all([
                                   updateTaskStatus({
@@ -348,27 +352,48 @@ const WorkPage = () => {
                             </IconButton>
                           </Box>
                         )}
-                        <Typography
+                        <Box
                           style={{
-                            fontSize: 18,
-                            textDecoration: "underline",
-                            cursor:
-                              hoverTitleTaskList === taskStatus.task_status_id
-                                ? "pointer"
-                                : "default",
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            height: 52,
                           }}
                         >
-                          {taskStatus.name}
-                        </Typography>
+                          <Typography
+                            style={{
+                              fontSize: 18,
+                              textDecoration: "underline",
+                              cursor:
+                                hoverTitleTaskList === taskStatus.task_status_id
+                                  ? "pointer"
+                                  : "default",
+                            }}
+                          >
+                            {truncate(taskStatus.name, 15)}
+                          </Typography>
+                        </Box>
 
                         {hoverTitleTaskList === taskStatus.task_status_id && (
                           <IconButton
                             style={{ position: "absolute", right: 0 }}
                             onClick={async () =>
-                              await deleteTaskStatus({
-                                room_id: roomId ?? "",
-                                task_status_id: taskStatus.task_status_id,
-                              })
+                              await Promise.all([
+                                deleteTaskStatus({
+                                  room_id: roomId ?? "",
+                                  task_status_id: taskStatus.task_status_id,
+                                }),
+                                ...tasks
+                                  .filter(
+                                    (task) => task.status === taskStatus.name
+                                  )
+                                  .map((task) =>
+                                    deleteTask({
+                                      room_id: roomId ?? "",
+                                      id: task.id,
+                                    })
+                                  ),
+                              ])
                             }
                           >
                             <BiX />
@@ -400,8 +425,8 @@ const WorkPage = () => {
                     await createTaskStatus({
                       room_id: roomId ?? "",
                       new_task_status: {
-                        name: "Process " + (taskStatuses.length + 1),
-                        order: taskStatuses.length,
+                        name: "Process " + (taskStatuses?.length + 1),
+                        order: taskStatuses?.length,
                       },
                     })
                   }
@@ -415,11 +440,13 @@ const WorkPage = () => {
         </Box>
       </LeftSideBar>
 
-      <TaskDetailDialog
-        task={currentTask}
-        open={!!currentTask}
-        onClose={() => setCurrentTask(undefined)}
-      />
+      {!!currentTask && (
+        <TaskDetailDialog
+          task={currentTask}
+          open={!!currentTask}
+          onClose={() => setCurrentTask(undefined)}
+        />
+      )}
     </>
   );
 };

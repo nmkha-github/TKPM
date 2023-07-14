@@ -282,15 +282,12 @@ const TasksProvider = ({ children }: TasksContextProviderProps) => {
       try {
         setCreatingTask(true);
         const time = Timestamp.now();
-        const minOrderTask = tasks
-          .filter((task) => task.status === "toDo")
-          .sort((taskA, taskB) =>
-            taskA.order_value >= taskB.order_value ? 1 : -1
-          )[0];
+        const minOrderTask = tasks.sort((taskA, taskB) =>
+          taskA.order_value >= taskB.order_value ? 1 : -1
+        )[0];
         const docResponse = await addDoc(
           collection(db, "room", room_id, "task"),
           {
-            status: "toDo",
             creator_id: user?.id,
             order_value: TaskHelper.getOrderString(
               "",
@@ -304,36 +301,36 @@ const TasksProvider = ({ children }: TasksContextProviderProps) => {
         await updateDoc(doc(db, "room", room_id, "task", docResponse.id), {
           id: docResponse.id,
         });
-        const newTask = {
-          status: "toDo",
-          id: docResponse.id,
-          order_value: TaskHelper.getOrderString(
-            "",
-            minOrderTask ? minOrderTask.order_value : ""
-          ),
-          creator_id: user?.id,
-          created_at: time,
-          last_edit: time,
-          ...new_task,
-        };
+        // const newTask = {
+        //   status: "toDo",
+        //   id: docResponse.id,
+        //   order_value: TaskHelper.getOrderString(
+        //     "",
+        //     minOrderTask ? minOrderTask.order_value : ""
+        //   ),
+        //   creator_id: user?.id,
+        //   created_at: time,
+        //   last_edit: time,
+        //   ...new_task,
+        // };
 
-        if (newTask.assignee_id) {
-          const memberDocs = await getDocs(
-            query(
-              collection(db, "room", room_id, "member"),
-              where("id", "==", newTask.assignee_id)
-            )
-          );
+        // if (newTask.assignee_id) {
+        //   const memberDocs = await getDocs(
+        //     query(
+        //       collection(db, "room", room_id, "member"),
+        //       where("id", "==", newTask.assignee_id)
+        //     )
+        //   );
 
-          await runTransaction(db, async (transaction) => {
-            transaction.update(
-              doc(db, "room", room_id, "member", memberDocs.docs[0].id),
-              {
-                [newTask.status]: memberDocs.docs[0].data()[newTask.status] + 1,
-              }
-            );
-          });
-        }
+        //   await runTransaction(db, async (transaction) => {
+        //     transaction.update(
+        //       doc(db, "room", room_id, "member", memberDocs.docs[0].id),
+        //       {
+        //         [newTask.status]: memberDocs.docs[0].data()[newTask.status] + 1,
+        //       }
+        //     );
+        //   });
+        // }
 
         // setTasks([newTask as TaskData, ...tasks]);
       } catch (error) {
@@ -366,37 +363,37 @@ const TasksProvider = ({ children }: TasksContextProviderProps) => {
         const time = Timestamp.now();
         setUpdatingTask(true);
 
-        const taskBeforeDoc = await getDoc(
-          doc(db, "room", room_id, "task", id)
-        );
+        // const taskBeforeDoc = await getDoc(
+        //   doc(db, "room", room_id, "task", id)
+        // );
 
-        if (taskBeforeDoc.data()?.assignee_id) {
-          const memberHoldTaskDocs = await getDocs(
-            query(
-              collection(db, "room", room_id, "member"),
-              where("id", "==", taskBeforeDoc.data()?.assignee_id)
-            )
-          );
-          if (memberHoldTaskDocs.docs.length > 0) {
-            await runTransaction(db, async (transaction) => {
-              transaction.update(
-                doc(
-                  db,
-                  "room",
-                  room_id,
-                  "member",
-                  memberHoldTaskDocs.docs[0].id
-                ),
-                {
-                  [taskBeforeDoc.data()?.status]:
-                    memberHoldTaskDocs.docs[0].data()[
-                      taskBeforeDoc.data()?.status
-                    ] - 1,
-                }
-              );
-            });
-          }
-        }
+        // if (taskBeforeDoc.data()?.assignee_id) {
+        //   const memberHoldTaskDocs = await getDocs(
+        //     query(
+        //       collection(db, "room", room_id, "member"),
+        //       where("id", "==", taskBeforeDoc.data()?.assignee_id)
+        //     )
+        //   );
+        //   if (memberHoldTaskDocs.docs.length > 0) {
+        //     await runTransaction(db, async (transaction) => {
+        //       transaction.update(
+        //         doc(
+        //           db,
+        //           "room",
+        //           room_id,
+        //           "member",
+        //           memberHoldTaskDocs.docs[0].id
+        //         ),
+        //         {
+        //           [taskBeforeDoc.data()?.status]:
+        //             memberHoldTaskDocs.docs[0].data()[
+        //               taskBeforeDoc.data()?.status
+        //             ] - 1,
+        //         }
+        //       );
+        //     });
+        //   }
+        // }
 
         await updateDoc(doc(db, "room", room_id, "task", id), {
           last_edit: time,
@@ -413,48 +410,49 @@ const TasksProvider = ({ children }: TasksContextProviderProps) => {
           ...updateData,
         });
 
-        const taskAfter = {
-          ...taskBeforeDoc.data(),
-          last_edit: time,
-          ...updateData,
-        };
+        // const taskAfter = {
+        //   ...taskBeforeDoc.data(),
+        //   last_edit: time,
+        //   ...updateData,
+        // };
 
-        const memberAssigneeTaskDocs = await getDocs(
-          query(
-            collection(db, "room", room_id, "member"),
-            where(
-              "id",
-              "==",
-              updateData.assignee_id || taskBeforeDoc.data()?.assignee_id
-            )
-          )
-        );
+        // const memberAssigneeTaskDocs = await getDocs(
+        //   query(
+        //     collection(db, "room", room_id, "member"),
+        //     where(
+        //       "id",
+        //       "==",
+        //       updateData.assignee_id || taskBeforeDoc.data()?.assignee_id
+        //     )
+        //   )
+        // );
 
-        if (memberAssigneeTaskDocs.docs.length > 0)
-          await runTransaction(db, async (transaction) => {
-            transaction.update(
-              doc(
-                db,
-                "room",
-                room_id,
-                "member",
-                memberAssigneeTaskDocs.docs[0].id
-              ),
-              {
-                [taskAfter.status || "error"]:
-                  memberAssigneeTaskDocs.docs[0].data()[
-                    taskAfter.status || "error"
-                  ] + 1,
-              }
-            );
-          });
+        // if (memberAssigneeTaskDocs.docs.length > 0) {
+        //   await runTransaction(db, async (transaction) => {
+        //     transaction.update(
+        //       doc(
+        //         db,
+        //         "room",
+        //         room_id,
+        //         "member",
+        //         memberAssigneeTaskDocs.docs[0].id
+        //       ),
+        //       {
+        //         [taskAfter.status || "error"]:
+        //           memberAssigneeTaskDocs.docs[0].data()[
+        //             taskAfter.status || "error"
+        //           ] + 1,
+        //       }
+        //     );
+        //   });
+        // }
       } catch (error) {
         showSnackbarError(error);
       } finally {
         setUpdatingTask(false);
       }
     },
-    [showSnackbarError]
+    [showSnackbarError, tasks]
   );
 
   const deleteTask = useCallback(
@@ -464,28 +462,28 @@ const TasksProvider = ({ children }: TasksContextProviderProps) => {
 
         // setTasks(tasks.filter((task) => task.id !== id));
 
-        const taskDoc = await getDoc(doc(db, "room", room_id, "task", id));
-        const memberHoldTaskDocs = await getDocs(
-          query(
-            collection(db, "room", room_id, "member"),
-            where("id", "==", taskDoc.data()?.assignee_id)
-          )
-        );
-        if (memberHoldTaskDocs.docs.length) {
-          await runTransaction(db, async (transaction) => {
-            transaction.update(
-              doc(db, "room", room_id, "member", memberHoldTaskDocs.docs[0].id),
-              {
-                [taskDoc.data()?.status]:
-                  memberHoldTaskDocs.docs[0].data()[taskDoc.data()?.status] - 1,
-              }
-            );
-          });
-        }
+        // const taskDoc = await getDoc(doc(db, "room", room_id, "task", id));
+        // const memberHoldTaskDocs = await getDocs(
+        //   query(
+        //     collection(db, "room", room_id, "member"),
+        //     where("id", "==", taskDoc.data()?.assignee_id)
+        //   )
+        // );
+        // if (memberHoldTaskDocs.docs.length) {
+        //   await runTransaction(db, async (transaction) => {
+        //     transaction.update(
+        //       doc(db, "room", room_id, "member", memberHoldTaskDocs.docs[0].id),
+        //       {
+        //         [taskDoc.data()?.status]:
+        //           memberHoldTaskDocs.docs[0].data()[taskDoc.data()?.status] - 1,
+        //       }
+        //     );
+        //   });
+        // }
 
         await deleteDoc(doc(db, "room", room_id, "task", id));
 
-        setCurrentTask({} as TaskData);
+        setCurrentTask(undefined);
       } catch (error) {
         showSnackbarError(error);
       } finally {
