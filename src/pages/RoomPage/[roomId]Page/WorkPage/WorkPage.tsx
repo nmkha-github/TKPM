@@ -207,8 +207,11 @@ const WorkPage = () => {
                 itemsAction={[
                   () => {
                     const data = {
-                      has_cover_page: false,
+                      cover_page_002: true,
                       company_name: "ABC Company",
+                      report_title: "Issue List",
+                      lorem_text:
+                        "Thống kê công việc quý 2 năm 2023, lưu sổ BM02-23",
                       tasks: tasks.map((task) => ({
                         title: task.title,
                         content: task.content || "",
