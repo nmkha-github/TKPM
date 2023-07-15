@@ -34,11 +34,11 @@ Application base on [Trello](https://trello.com)
 - Install [NodeJs](https://nodejs.org/en/download)
 - Clone the project
 ```
-git clone https://github.com/nmkha-github/NMCNPM.git
+git clone https://github.com/nmkha-github/TKPM.git
 ```
 - Go to the project directory
 ```
-cd NMCNPM
+cd TKPM
 ```
 - Install package
 ```
@@ -71,8 +71,7 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     match /{document=**} {
-      allow read, write: if
-          request.time < timestamp.date(2023, 1, 19);
+      allow read, write: if true;
     }
   }
 }
