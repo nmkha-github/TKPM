@@ -48,46 +48,6 @@ npm install
 ```
 npm start
 ```
-## Database manage
-To manage database, following tutorial
-- Create a project in Firebase.
-- Replace SDK in file src/lib/config/firebase-config.tsx
-```
-const FirebaseConfig = {
-  // Replace all in this object
-  apiKey: "AIzaSyASap1ay125TJIPgYsAEqdE4JvXqUhFhT8",
-  authDomain: "nmcnpm-d177c.firebaseapp.com",
-  databaseURL: "https://nmcnpm-d177c-default-rtdb.firebaseio.com",
-  projectId: "nmcnpm-d177c",
-  storageBucket: "nmcnpm-d177c.appspot.com",
-  messagingSenderId: "658397747139",
-  appId: "1:658397747139:web:38ba98009508d364b0cf76",
-  measurementId: "G-FGC4SP6FC4",
-};
-```
-- Config rules for Firestore Database
-```
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if true;
-    }
-  }
-}
-```
-- Config rules for Storage
-```
-rules_version = '2';
-service firebase.storage {
-  match /b/{bucket}/o {
-    match /{allPaths=**} {
-      allow write: if request.auth != null;
-      allow read;
-    }
-  }
-}
-```
 
 ## Current Status
 - Authorization (Login, logout, register user account).
@@ -95,12 +55,11 @@ service firebase.storage {
 - Module task (includes **4 status** ToDo, Doing, Reviewing, Done) with create, edit, assign, statistic actions in **realtime**.
 - Module member in room with delete, statistic actions.
 - Module newsfeed for the notification or usage like a forum.
+- Module schedule
 ## Future Status
 - Update task detail with more feature
-- Update task status with flexible status 
 - Update feature notify user on email
 - Update feature resource
-- Update feature schedule
 ## Deployment
 
 Config in vercel deploy by branch main in this repository when merge branch or any change in main branch.
