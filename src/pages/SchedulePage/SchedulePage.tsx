@@ -18,9 +18,11 @@ import {
   Grid,
   Typography,
 } from "@mui/material";
+import { Navigate } from "react-router";
 import TaskData from "../../modules/task/interface/task-data";
 import dayjs, { Dayjs } from "dayjs";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { useNavigate } from "react-router-dom";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { BiFilterAlt } from "react-icons/bi";
 import { ImSortAlphaAsc, ImSortAlphaDesc } from "react-icons/im";
@@ -56,8 +58,9 @@ const localizer = momentLocalizer(moment);
 const DragAndDropCalendar = withDragAndDrop(Calendar);
 const SchedulePage = () => {
   const [myEvents, setMyEvents] = useState<any[]>([]);
+  let navigate = useNavigate();
   const handleSelectEvent = useCallback(
-    (event) => window.alert(event.title),
+    (event) => navigate("/room/" + event.roomid + "/work"),
     []
   );
   const { rooms, getRooms, loadingRooms, loadingMoreRooms, loadedAllRooms } =
@@ -74,7 +77,7 @@ const SchedulePage = () => {
   useEffect(() => {
     if (rooms) {
       getTasks({ room_id:"",rooms_id: rooms.map(x=>x.id) });
-    }
+    }//
   }, [rooms]);
   useEffect(() => {
     console.log(tasks)
@@ -84,6 +87,7 @@ const SchedulePage = () => {
         //.filter(({ id }, index) => !ids.includes(id, index + 1))
         .map((task) => ({
           id: task.id,
+          roomid: task.roomid,
           title: task.title,
           start: task.deadline.toDate(),
           allDay: true,
@@ -100,6 +104,7 @@ const SchedulePage = () => {
         localizer={localizer}
         events={myEvents}
         onSelectEvent={handleSelectEvent}
+        views={['month']}
         startAccessor="start"
         endAccessor="end"
         style={{ height: 500, padding: 5 }}
