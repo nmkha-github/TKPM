@@ -256,7 +256,7 @@ const TasksProvider = ({ children }: TasksContextProviderProps) => {
       try {
         if(rooms_id){
             onSnapshot(query(collectionGroup(db, "task")), (taskDocs) => {
-              setTasks(taskDocs.docs.filter((task)=>rooms_id.includes(task.ref.path.split("/")[1])).map((taskDoc) => taskDoc.data() as TaskData))
+              setTasks(taskDocs.docs.filter((task)=>rooms_id.includes(task.ref.path.split("/")[1])&&task.data().assignee_id===user?.id).map((taskDoc) => taskDoc.data() as TaskData))
             })
         }
         else{

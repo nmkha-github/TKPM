@@ -20,10 +20,8 @@ import {
 } from "@mui/material";
 import TaskData from "../../modules/task/interface/task-data";
 import dayjs, { Dayjs } from "dayjs";
-import { DemoContainer, DemoItem } from "@mui/x-date-pickers/internals/demo";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import { BiFilterAlt } from "react-icons/bi";
 import { ImSortAlphaAsc, ImSortAlphaDesc } from "react-icons/im";
 import SearchIcon from "@mui/icons-material/Search";
@@ -44,6 +42,7 @@ import moment from "moment";
 import { useTasks } from "../../lib/provider/TasksProvider";
 import { unionTypeAnnotation } from "@babel/types";
 import { Timestamp } from "@firebase/firestore";
+import { useSchedule } from "../../lib/provider/ScheduleProvider";
 interface Event {
   id: string;
   title: string;
@@ -63,6 +62,7 @@ const SchedulePage = () => {
   );
   const { rooms, getRooms, loadingRooms, loadingMoreRooms, loadedAllRooms } =
     useRooms();
+  const {userTasks,getUserTasks}=useSchedule();
   const [TotalTasks, setTotalTasks] = useState<TaskData[]>([]);
   const { tasks, getTasks } = useTasks();
   useEffect(() => {
