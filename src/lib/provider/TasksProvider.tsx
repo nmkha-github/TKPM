@@ -5,6 +5,7 @@ import {
   deleteDoc,
   doc,
   getDoc,
+  collectionGroup,
   getDocs,
   onSnapshot,
   query,
@@ -21,6 +22,7 @@ import CommentData from "../interface/comment-data";
 import { useUser } from "./UserProvider";
 import TaskHelper from "../../modules/task/util/task-helper";
 import TaskStatusData from "../../modules/task/interface/task-status-data";
+import { async } from "q";
 
 interface TasksContextProps {
   taskStatuses: TaskStatusData[];
@@ -53,7 +55,7 @@ interface TasksContextProps {
 
   tasks: TaskData[];
   setTasks: (tasks: TaskData[]) => void;
-  getTasks: (payload: { room_id: string }) => Promise<void>;
+  getTasks: (payload: { room_id: string; rooms_id?:string[] }) => Promise<void>;
 
   currentTask?: TaskData;
   setCurrentTask: (task?: TaskData) => void;
@@ -250,11 +252,18 @@ const TasksProvider = ({ children }: TasksContextProviderProps) => {
   );
 
   const getTasks = useCallback(
-    async ({ room_id }: { room_id: string }) => {
+    async ({ room_id,rooms_id }: { room_id: string;rooms_id?:string[] }) => {
       try {
-        onSnapshot(collection(db, "room", room_id, "task"), (taskDocs) => {
-          setTasks(taskDocs.docs.map((taskDoc) => taskDoc.data() as TaskData));
-        });
+        if(rooms_id){
+            onSnapshot(query(collectionGroup(db, "task")), (taskDocs) => {
+              setTasks(taskDocs.docs.filter((task)=>rooms_id.includes(task.ref.path.split("/")[1])).map((taskDoc) => taskDoc.data() as TaskData))
+            })
+        }
+        else{
+          onSnapshot(collection(db, "room", room_id, "task"), (taskDocs) => {
+            setTasks(taskDocs.docs.map((taskDoc) => taskDoc.data() as TaskData));
+          });
+        }
       } catch (error) {
         showSnackbarError(error);
       }
