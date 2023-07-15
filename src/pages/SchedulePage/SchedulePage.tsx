@@ -66,23 +66,22 @@ const SchedulePage = () => {
   const [TotalTasks, setTotalTasks] = useState<TaskData[]>([]);
   const { tasks, getTasks } = useTasks();
   useEffect(() => {
-    getRooms({ getStart: 0, getLimit: 9999 });
+    getRooms({ getStart: 0 });
   }, []);
-  useEffect(() => {
-    if (rooms) {
-      rooms.forEach(async (room) => {
-        await getTasks({ room_id: room.id });
-      });
-    }
-  }, [rooms]);
   useEffect(() => {
     setTotalTasks([...TotalTasks, ...tasks]);
   }, [tasks]);
   useEffect(() => {
-    const ids = TotalTasks.map(({ id }) => id);
+    if (rooms) {
+      getTasks({ room_id:"",rooms_id: rooms.map(x=>x.id) });
+    }
+  }, [rooms]);
+  useEffect(() => {
+    console.log(tasks)
+    const ids = tasks.map(({ id }) => id);
     setMyEvents(
       tasks.filter((task): task is TaskDataDeadline => !!task.deadline)
-        .filter(({ id }, index) => !ids.includes(id, index + 1))
+        //.filter(({ id }, index) => !ids.includes(id, index + 1))
         .map((task) => ({
           id: task.id,
           title: task.title,
@@ -91,7 +90,7 @@ const SchedulePage = () => {
           end: task.deadline.toDate(),
         }))
     );
-  }, [TotalTasks]);
+  }, [tasks]);
   useEffect(() => {
     console.log(myEvents)
   }, [myEvents]);
