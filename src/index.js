@@ -11,6 +11,7 @@ import MembersProvider from './lib/provider/MembersProvider';
 import TasksProvider from './lib/provider/TasksProvider';
 import PostsProvider from './lib/provider/PostsProvider';
 import ConfirmDialogProvider from './lib/provider/ConfirmDialogProvider';
+import ScheduleProvider from './lib/provider/ScheduleProvider';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -21,17 +22,19 @@ root.render(
             <UserProvider>
               <Header>
                 {/* add provider here */}
-                <RoomsProvider>
-                  <MembersProvider>
-                    <TasksProvider>
-                      <PostsProvider>
-                        {/* ----------------- */}
-                        <AppRoutes />
-                        {/* add provider here */}
-                      </PostsProvider>
-                    </TasksProvider>
-                  </MembersProvider>
-                </RoomsProvider>
+                <ScheduleProvider>
+                  <RoomsProvider>
+                    <MembersProvider>
+                      <TasksProvider>
+                        <PostsProvider>
+                          {/* ----------------- */}
+                          <AppRoutes />
+                          {/* add provider here */}
+                        </PostsProvider>
+                      </TasksProvider>
+                    </MembersProvider>
+                  </RoomsProvider>
+                </ScheduleProvider>
                 {/* ----------------- */}
               </Header>
             </UserProvider>
