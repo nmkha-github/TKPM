@@ -18,6 +18,7 @@ import { BiArrowFromLeft, BiArrowFromRight, BiPlus, BiX } from "react-icons/bi";
 import TaskStatusData from "../../../../modules/task/interface/task-status-data";
 import truncate from "../../../../lib/util/truncate";
 import InputDialog from "../../../../lib/components/InputDialog/InputDialog";
+import { useConfirmDialog } from "../../../../lib/provider/ConfirmDialogProvider";
 
 const WorkPage = () => {
   const { getCurrentRoom, currentRoom } = useRooms();
@@ -45,6 +46,8 @@ const WorkPage = () => {
   const [showInputDialog, setShowInputDialog] = useState("");
   const [editTaskStatus, setEditTaskStatus] = useState<TaskStatusData>();
   const [isDraggingId, setIsDraggingId] = useState("-1");
+
+  const { showConfirmDialog } = useConfirmDialog();
 
   useEffect(() => {
     getCurrentRoom(roomId || "");
@@ -95,8 +98,6 @@ const WorkPage = () => {
     };
 
     // setTasks(tasks.filter((task) => task.id !== result.draggableId));
-    console.log(taskDestinitionList);
-    console.log(result.destination.index);
 
     await updateTask({
       room_id: roomId ? roomId : "",
@@ -203,6 +204,7 @@ const WorkPage = () => {
         >
           <Box style={{ display: "flex", justifyContent: "space-between" }}>
             <Button
+              disabled={!taskStatuses.length}
               variant="contained"
               color="primary"
               style={{
@@ -385,22 +387,30 @@ const WorkPage = () => {
                           <IconButton
                             style={{ position: "absolute", right: 0 }}
                             onClick={async () =>
-                              await Promise.all([
-                                deleteTaskStatus({
-                                  room_id: roomId ?? "",
-                                  task_status_id: taskStatus.task_status_id,
-                                }),
-                                ...tasks
-                                  .filter(
-                                    (task) => task.status === taskStatus.name
-                                  )
-                                  .map((task) =>
-                                    deleteTask({
+                              showConfirmDialog({
+                                title: "Xóa trạng thái",
+                                content:
+                                  "Bạn có thực sự muốn xóa trạng thái công việc này không?",
+                                onConfirm: async () => {
+                                  await Promise.all([
+                                    deleteTaskStatus({
                                       room_id: roomId ?? "",
-                                      id: task.id,
-                                    })
-                                  ),
-                              ])
+                                      task_status_id: taskStatus.task_status_id,
+                                    }),
+                                    ...tasks
+                                      .filter(
+                                        (task) =>
+                                          task.status === taskStatus.name
+                                      )
+                                      .map((task) =>
+                                        deleteTask({
+                                          room_id: roomId ?? "",
+                                          id: task.id,
+                                        })
+                                      ),
+                                  ]);
+                                },
+                              })
                             }
                           >
                             <BiX />

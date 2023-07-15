@@ -143,7 +143,13 @@ const TaskDetailDialog = ({
   const { showConfirmDialog } = useConfirmDialog();
 
   const { currentRoom, loadingCurrentRoom } = useRooms();
-  const { updateTask, deleteTask, setCurrentTask } = useTasks();
+  const {
+    taskStatuses,
+    getTaskStatuses,
+    updateTask,
+    deleteTask,
+    setCurrentTask,
+  } = useTasks();
   const { member, getMember } = useMembers();
   const { user } = useUser();
   const theme = useTheme();
@@ -159,16 +165,15 @@ const TaskDetailDialog = ({
   const [moreActionsAnchorEl, setMoreActionsAnchorEl] =
     useState<null | HTMLElement>(null);
 
-  const statusOptions = ["toDo", "doing", "reviewing", "done"]; // for test; get from provider later
-
   const [statusAnchorEl, setStatusAnchorEl] = useState<null | HTMLElement>(
     null
   );
-  const [statusSelectedIndex, setStatusSelectedIndex] = useState(0);
+  const [statusSelected, setStatusSelected] = useState("");
 
   useEffect(() => {
+    getTaskStatuses({ room_id: currentRoom.id });
     task && setEditTask({ ...task });
-    setStatusSelectedIndex(statusOptions.indexOf(task?.status || "toDo"));
+    setStatusSelected(task?.status || "");
 
     task && getMember({ room_id: currentRoom.id, member_id: task.creator_id });
   }, [task]);
@@ -277,7 +282,7 @@ const TaskDetailDialog = ({
                 setIsEditingDeadline(false);
                 setMoreActionsAnchorEl(null);
                 setStatusAnchorEl(null);
-                setStatusSelectedIndex(0);
+                setStatusSelected("");
               }}
             >
               <IconButton>
@@ -495,10 +500,7 @@ const TaskDetailDialog = ({
                 aria-expanded={!!statusAnchorEl ? "true" : undefined}
                 onClick={(event) => setStatusAnchorEl(event.currentTarget)}
               >
-                <ListItemText
-                  primary="Trạng thái"
-                  secondary={statusOptions[statusSelectedIndex]}
-                />
+                <ListItemText primary="Trạng thái" secondary={statusSelected} />
                 <ExpandMoreIcon />
               </ListItem>
             </List>
@@ -743,28 +745,29 @@ const TaskDetailDialog = ({
           "aria-labelledby": "status-button",
         }}
         transformOrigin={{ horizontal: "right", vertical: "top" }}
-        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+        anchorOrigin={{ horizontal: "right", vertical: "center" }}
         TransitionComponent={Fade}
       >
-        {statusOptions.map((option, index) => (
-          <MenuItem
-            key={option}
-            selected={index === statusSelectedIndex}
-            onClick={async (event) => {
-              setStatusSelectedIndex(index);
-              setStatusAnchorEl(null);
-              await updateTask({
-                room_id: currentRoom.id,
-                id: editTask.id,
-                updateData: {
-                  status: option,
-                },
-              });
-            }}
-          >
-            {option}
-          </MenuItem>
-        ))}
+        {taskStatuses
+          .map((taskStatus) => taskStatus.name)
+          .map((option) => (
+            <MenuItem
+              selected={option === statusSelected}
+              onClick={async () => {
+                setStatusSelected(option);
+                setStatusAnchorEl(null);
+                await updateTask({
+                  room_id: currentRoom.id,
+                  id: editTask.id,
+                  updateData: {
+                    status: option,
+                  },
+                });
+              }}
+            >
+              {option}
+            </MenuItem>
+          ))}
       </Menu>
     </Dialog>
   );
