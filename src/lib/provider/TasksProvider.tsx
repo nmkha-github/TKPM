@@ -250,13 +250,15 @@ const TasksProvider = ({ children }: TasksContextProviderProps) => {
     },
     [showSnackbarError]
   );
-
+  const applyChanges = <S, K extends keyof S>(state : S, changes : Pick<S, K>) : S =>
+  Object.assign({}, state, changes);
   const getTasks = useCallback(
     async ({ room_id,rooms_id }: { room_id: string;rooms_id?:string[] }) => {
       try {
         if(rooms_id){
             onSnapshot(query(collectionGroup(db, "task")), (taskDocs) => {
-              setTasks(taskDocs.docs.filter((task)=>rooms_id.includes(task.ref.path.split("/")[1])&&task.data().assignee_id===user?.id).map((taskDoc) => taskDoc.data() as TaskData))
+              console.log(taskDocs.docs[0].data())
+              setTasks(taskDocs.docs.filter((task)=>rooms_id.includes(task.ref.path.split("/")[1])&&task.data().assignee_id===user?.id).map((taskDoc) => applyChanges(taskDoc.data(),{roomid:taskDoc.ref.path.split("/")[1]}) as TaskData))
             })
         }
         else{

@@ -14,6 +14,7 @@ interface TaskData {
   created_at: Timestamp | Date | string;
   deadline?: Timestamp | Date | string;
   last_edit?: Timestamp;
+  roomid?: string;
   comments?: CommentData[];
 }
 
