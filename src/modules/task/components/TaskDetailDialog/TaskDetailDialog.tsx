@@ -588,7 +588,7 @@ const TaskDetailDialog = ({
                       <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
                           value={(task?.deadline as Timestamp) || null}
-                          format={"DD/MM/YYYY"}
+                          inputFormat={"DD/MM/YYYY"}
                           onChange={async (newValue: Timestamp | null) => {
                             if (
                               !newValue ||
@@ -616,7 +616,7 @@ const TaskDetailDialog = ({
                             });
                           }}
                           onClose={async () => {}}
-                          slots={({
+                          renderInput={({
                             inputRef,
                             inputProps,
                             InputProps,
