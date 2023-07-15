@@ -13,7 +13,6 @@ import { DragDropContext, DragStart, DropResult } from "react-beautiful-dnd";
 import CreateTaskDialog from "../../../../modules/task/components/CreateTaskDialog/CreateTaskDialog";
 import TaskHelper from "../../../../modules/task/util/task-helper";
 import ShowMenuButton from "../../../../lib/components/ShowMenuButton/ShowMenuButton";
-import exportTasksToWord from "../../../../modules/task/util/export-tasks-to-word";
 import ExportDocxDialog from "../../../../modules/task/components/ExportDocxDialog/ExportDocxDialog";
 
 const WorkPage = () => {
@@ -208,25 +207,6 @@ const WorkPage = () => {
                 itemsTitle={["Xuất Word", "Xuất HTML", "Xuất CSV"]}
                 itemsAction={[
                   () => {
-                    // const data = {
-                    //   cover_page_002: true,
-                    //   company_name: "ABC Company",
-                    //   report_title: "Issue List",
-                    //   lorem_text:
-                    //     "Thống kê công việc quý 2 năm 2023, lưu sổ BM02-23",
-                    //   tasks: tasks.map((task) => ({
-                    //     title: task.title,
-                    //     content: task.content || "",
-                    //     status: task.status,
-                    //     assignee_id: task.assignee_id,
-                    //     creator_id: task.creator_id,
-                    //     created_at: task.created_at,
-                    //     deadline: task.deadline || "",
-                    //     last_edit: task.last_edit || "",
-                    //     room: "TODO",
-                    //   })),
-                    // };
-                    // exportTasksToWord(data);
                     setOpenExportDocxDialog(true);
                   },
                   () => {

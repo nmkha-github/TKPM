@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import {
   Box,
   Dialog,
@@ -13,76 +14,128 @@ import {
   InputLabel,
   FormControl,
   Button,
+  SelectChangeEvent,
 } from "@mui/material";
-import { useRooms } from "../../../../lib/provider/RoomsProvider";
-import { useUser } from "../../../../lib/provider/UserProvider";
-import makeStyles from "@mui/styles/makeStyles";
-import { useState } from "react";
+import exportTasksToWord from "../../util/export-tasks-to-word";
 
 interface ExportDocxDialogProps {}
-
-const useStyle = makeStyles((theme) => ({
-  dialog: {
-    padding: "8px 24px 16px",
-  },
-  edit_field: {
-    transition: "background 0.4s ease",
-    "&:hover": {
-      background: "#EBECF0",
-    },
-  },
-  field_title: {
-    fontFamily:
-      "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,'Fira Sans','Droid Sans','Helvetica Neue',sans-serif",
-    fontWeight: 600,
-    fontSize: 14,
-    lineHeight: "24px",
-    color: "#666666",
-  },
-  dialogHeader: {
-    position: "sticky",
-    top: 0,
-    zIndex: 1,
-    padding: "16px 0",
-    marginBottom: 16,
-    boxShadow: "0px 2px 4px rgba(30, 136, 229, 0.1)",
-    fontWeight: "bold",
-    background: "white",
-  },
-}));
 
 const ExportDocxDialog = ({
   ...dialogProps
 }: ExportDocxDialogProps & DialogProps) => {
-  const classes = useStyle();
-  const { currentRoom, loadingCurrentRoom } = useRooms();
-  const { user } = useUser();
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const [fileName, setFileName] = useState("");
+  const [fileName, setFileName] = useState("output");
+  const [language, setLanguage] = useState("EN");
   const [headerChecked, setHeaderChecked] = useState(false);
+  const [header1, setHeader1] = useState("");
+  const [header2, setHeader2] = useState("");
   const [footerChecked, setFooterChecked] = useState(false);
+  const [footer1, setFooter1] = useState("");
+  const [footer2, setFooter2] = useState("");
+  const [footer3, setFooter3] = useState("");
   const [coverChecked, setCoverChecked] = useState(false);
+  const [cover1, setCover1] = useState("");
+  const [cover2, setCover2] = useState("");
+  const [cover3, setCover3] = useState("");
+  const [coverType, setCoverType] = useState("");
 
   const handleFileNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFileName(event.target.value);
+  };
+
+  const handleLanguageChange = (event: SelectChangeEvent) => {
+    setLanguage(event.target.value as string);
   };
 
   const handleHeaderCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
     setHeaderChecked(event.target.checked);
   };
 
+  const handleHeader1Change = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setHeader1(event.target.value);
+  };
+
+  const handleHeader2Change = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setHeader2(event.target.value);
+  };
+
   const handleFooterCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFooterChecked(event.target.checked);
+  };
+
+  const handleFooter1Change = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setFooter1(event.target.value);
+  };
+
+  const handleFooter2Change = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setFooter2(event.target.value);
+  };
+
+  const handleFooter3Change = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setFooter3(event.target.value);
   };
 
   const handleCoverCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
     setCoverChecked(event.target.checked);
   };
 
-  const isFileNameValid = fileName.trim() !== "";
+  const handleCover1Change = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setCover1(event.target.value);
+  };
 
+  const handleCover2Change = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setCover2(event.target.value);
+  };
+
+  const handleCover3Change = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setCover3(event.target.value);
+  };
+
+  const handleCoverTypeChange = (event: SelectChangeEvent) => {
+    setCoverType(event.target.value as string);
+  };
+
+  const isFileNameValid = /^[\w\d]+(\.[\w\d]+)?$/.test(fileName);
+
+  const handleConfirm = () => {
+    // const data = {
+    //   cover_page_002: true,
+    //   company_name: "ABC Company",
+    //   report_title: "Issue List",
+    //   lorem_text: "Thống kê công việc quý 2 năm 2023, lưu sổ BM02-23",
+    //   tasks: tasks.map((task) => ({
+    //     title: task.title,
+    //     content: task.content || "",
+    //     status: task.status,
+    //     assignee_id: task.assignee_id,
+    //     creator_id: task.creator_id,
+    //     created_at: task.created_at,
+    //     deadline: task.deadline || "",
+    //     last_edit: task.last_edit || "",
+    //     room: "TODO",
+    //   })),
+    // };
+    // exportTasksToWord(data);
+    // const data = {
+    //   fileName,
+    //   language,
+    //   headerChecked,
+    //   header1,
+    //   header2,
+    //   footerChecked,
+    //   footer1,
+    //   footer2,
+    //   footer3,
+    //   coverChecked,
+    //   cover1,
+    //   cover2,
+    //   cover3,
+    //   coverType,
+    // };
+    dialogProps.onClose?.({}, "backdropClick");
+  };
   return (
     <Dialog
       fullScreen={fullScreen}
@@ -90,14 +143,10 @@ const ExportDocxDialog = ({
       maxWidth="md"
       {...dialogProps}
     >
-      <Box className={classes.dialog}>
-        {/* Header of the dialog */}
-        <Box className={classes.dialogHeader}>
-          <Typography variant="h5" component="div">
-            Xuất danh sách công việc sang file docx
-          </Typography>
-        </Box>
-        {/* Body of the dialog */}
+      <Box p={2}>
+        <Typography variant="h5" component="div">
+          Xuất danh sách công việc sang file docx
+        </Typography>
         <TextField
           label="Tên file"
           variant="outlined"
@@ -106,28 +155,43 @@ const ExportDocxDialog = ({
           value={fileName}
           onChange={handleFileNameChange}
           error={!isFileNameValid}
-          helperText={!isFileNameValid && "Tên file không được để trống"}
+          helperText={
+            !isFileNameValid &&
+            "Tên file không hợp lệ. Chỉ chấp nhận các ký tự chữ cái, số, và dấu chấm. Tên file không được rỗng."
+          }
         />
         <FormControl fullWidth margin="normal">
           <InputLabel>Ngôn ngữ</InputLabel>
-          <Select defaultValue="" variant="outlined" label="Ngôn ngữ" fullWidth>
+          <Select
+            value={language}
+            onChange={handleLanguageChange}
+            variant="outlined"
+            label="Ngôn ngữ"
+            fullWidth
+          >
             <MenuItem value="VI">Tiếng Việt</MenuItem>
             <MenuItem value="EN">Tiếng Anh</MenuItem>
           </Select>
         </FormControl>
         <FormControlLabel
           control={
-            <Checkbox checked={headerChecked} onChange={handleHeaderCheck} />
+            <Checkbox
+              checked={headerChecked}
+              onChange={handleHeaderCheck}
+              color="primary"
+            />
           }
           label="Header"
         />
-        <Box style={{ display: "flex", gap: 10 }}>
+        <Box display="flex" gap={1}>
           <TextField
             label="Left header"
             variant="outlined"
             fullWidth
             margin="normal"
             disabled={!headerChecked}
+            value={header1}
+            onChange={handleHeader1Change}
           />
           <TextField
             label="Right header"
@@ -135,21 +199,29 @@ const ExportDocxDialog = ({
             fullWidth
             margin="normal"
             disabled={!headerChecked}
+            value={header2}
+            onChange={handleHeader2Change}
           />
         </Box>
         <FormControlLabel
           control={
-            <Checkbox checked={footerChecked} onChange={handleFooterCheck} />
+            <Checkbox
+              checked={footerChecked}
+              onChange={handleFooterCheck}
+              color="primary"
+            />
           }
           label="Footer"
         />
-        <Box style={{ display: "flex", gap: 10 }}>
+        <Box display="flex" gap={1}>
           <TextField
             label="Left footer"
             variant="outlined"
             fullWidth
             margin="normal"
             disabled={!footerChecked}
+            value={footer1}
+            onChange={handleFooter1Change}
           />
           <TextField
             label="Center footer"
@@ -157,6 +229,8 @@ const ExportDocxDialog = ({
             fullWidth
             margin="normal"
             disabled={!footerChecked}
+            value={footer2}
+            onChange={handleFooter2Change}
           />
           <TextField
             label="Right footer"
@@ -164,21 +238,29 @@ const ExportDocxDialog = ({
             fullWidth
             margin="normal"
             disabled={!footerChecked}
+            value={footer3}
+            onChange={handleFooter3Change}
           />
         </Box>
         <FormControlLabel
           control={
-            <Checkbox checked={coverChecked} onChange={handleCoverCheck} />
+            <Checkbox
+              checked={coverChecked}
+              onChange={handleCoverCheck}
+              color="primary"
+            />
           }
           label="Bìa"
         />
-        <Box style={{ display: "flex", gap: 10 }}>
+        <Box display="flex" gap={1}>
           <TextField
             label="Company's name"
             variant="outlined"
             fullWidth
             margin="normal"
             disabled={!coverChecked}
+            value={cover1}
+            onChange={handleCover1Change}
           />
           <TextField
             label="Report title"
@@ -186,6 +268,8 @@ const ExportDocxDialog = ({
             fullWidth
             margin="normal"
             disabled={!coverChecked}
+            value={cover2}
+            onChange={handleCover2Change}
           />
         </Box>
         <TextField
@@ -194,13 +278,16 @@ const ExportDocxDialog = ({
           fullWidth
           margin="normal"
           disabled={!coverChecked}
+          value={cover3}
+          onChange={handleCover3Change}
         />
         <FormControl fullWidth margin="normal">
           <InputLabel>Loại bìa</InputLabel>
           <Select
-            defaultValue=""
+            value={coverType}
+            onChange={handleCoverTypeChange}
             variant="outlined"
-            label="Mẫu bìa"
+            label="Loại bìa"
             fullWidth
             disabled={!coverChecked}
           >
@@ -212,7 +299,7 @@ const ExportDocxDialog = ({
             <MenuItem value="Loại 6">Loại 6</MenuItem>
           </Select>
         </FormControl>
-        <Box display="flex" justifyContent="flex-end" marginTop={2}>
+        <Box display="flex" justifyContent="flex-end" mt={2}>
           <Button
             onClick={() => {
               dialogProps.onClose?.({}, "backdropClick");
@@ -224,6 +311,7 @@ const ExportDocxDialog = ({
             variant="contained"
             color="primary"
             disabled={!isFileNameValid}
+            onClick={handleConfirm}
           >
             Đồng ý
           </Button>
