@@ -44,6 +44,7 @@ import moment from "moment";
 import { useTasks } from "../../lib/provider/TasksProvider";
 import { unionTypeAnnotation } from "@babel/types";
 import { Timestamp } from "@firebase/firestore";
+import { useSchedule } from "../../lib/provider/ScheduleProvider";
 interface Event {
   id: string;
   title: string;
@@ -63,6 +64,7 @@ const SchedulePage = () => {
   );
   const { rooms, getRooms, loadingRooms, loadingMoreRooms, loadedAllRooms } =
     useRooms();
+  const {userTasks,getUserTasks}=useSchedule();
   const [TotalTasks, setTotalTasks] = useState<TaskData[]>([]);
   const { tasks, getTasks } = useTasks();
   useEffect(() => {
