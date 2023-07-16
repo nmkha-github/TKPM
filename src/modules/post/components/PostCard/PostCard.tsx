@@ -82,7 +82,7 @@ const PostCard = ({ post }: PostCardProps) => {
         borderRadius: 8,
         display: "flex",
         margin: "8px 0px",
-        minWidth: 620,
+        width: 620,
         flexDirection: "column",
         justifyContent: "flex-end",
       }}
