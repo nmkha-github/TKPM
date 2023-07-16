@@ -16,11 +16,13 @@ import {
   Button,
   SelectChangeEvent,
 } from "@mui/material";
-import exportTasksToWord from "../../util/export-tasks-to-word";
 
-interface ExportDocxDialogProps {}
+interface ExportDocxDialogProps {
+  onConfirm: (any) => void;
+}
 
 const ExportDocxDialog = ({
+  onConfirm,
   ...dialogProps
 }: ExportDocxDialogProps & DialogProps) => {
   const theme = useTheme();
@@ -29,17 +31,17 @@ const ExportDocxDialog = ({
   const [fileName, setFileName] = useState("output");
   const [language, setLanguage] = useState("EN");
   const [headerChecked, setHeaderChecked] = useState(false);
-  const [header1, setHeader1] = useState("");
-  const [header2, setHeader2] = useState("");
+  const [left_header, set_left_header] = useState("");
+  const [right_header, set_right_header] = useState("");
   const [footerChecked, setFooterChecked] = useState(false);
-  const [footer1, setFooter1] = useState("");
-  const [footer2, setFooter2] = useState("");
-  const [footer3, setFooter3] = useState("");
+  const [left_footer, set_left_footer] = useState("");
+  const [center_footer, set_center_footer] = useState("");
+  const [right_footer, set_right_footer] = useState("");
   const [coverChecked, setCoverChecked] = useState(false);
-  const [cover1, setCover1] = useState("");
-  const [cover2, setCover2] = useState("");
-  const [cover3, setCover3] = useState("");
-  const [coverType, setCoverType] = useState("");
+  const [company_name, set_company_name] = useState("");
+  const [report_title, set_report_title] = useState("");
+  const [lorem_text, set_lorem_text] = useState("");
+  const [coverType, setCoverType] = useState("001");
 
   const handleFileNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFileName(event.target.value);
@@ -53,44 +55,60 @@ const ExportDocxDialog = ({
     setHeaderChecked(event.target.checked);
   };
 
-  const handleHeader1Change = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setHeader1(event.target.value);
+  const handle_left_header_change = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    set_left_header(event.target.value);
   };
 
-  const handleHeader2Change = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setHeader2(event.target.value);
+  const handle_right_header_change = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    set_right_header(event.target.value);
   };
 
   const handleFooterCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFooterChecked(event.target.checked);
   };
 
-  const handleFooter1Change = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setFooter1(event.target.value);
+  const handle_left_footer_change = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    set_left_footer(event.target.value);
   };
 
-  const handleFooter2Change = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setFooter2(event.target.value);
+  const handle_center_footer_change = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    set_center_footer(event.target.value);
   };
 
-  const handleFooter3Change = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setFooter3(event.target.value);
+  const handle_right_footer_change = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    set_right_footer(event.target.value);
   };
 
   const handleCoverCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
     setCoverChecked(event.target.checked);
   };
 
-  const handleCover1Change = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setCover1(event.target.value);
+  const handle_company_name_change = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    set_company_name(event.target.value);
   };
 
-  const handleCover2Change = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setCover2(event.target.value);
+  const handle_report_title_change = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    set_report_title(event.target.value);
   };
 
-  const handleCover3Change = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setCover3(event.target.value);
+  const handle_lorem_textChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    set_lorem_text(event.target.value);
   };
 
   const handleCoverTypeChange = (event: SelectChangeEvent) => {
@@ -100,40 +118,27 @@ const ExportDocxDialog = ({
   const isFileNameValid = /^[\w\d]+(\.[\w\d]+)?$/.test(fileName);
 
   const handleConfirm = () => {
-    // const data = {
-    //   cover_page_002: true,
-    //   company_name: "ABC Company",
-    //   report_title: "Issue List",
-    //   lorem_text: "Thống kê công việc quý 2 năm 2023, lưu sổ BM02-23",
-    //   tasks: tasks.map((task) => ({
-    //     title: task.title,
-    //     content: task.content || "",
-    //     status: task.status,
-    //     assignee_id: task.assignee_id,
-    //     creator_id: task.creator_id,
-    //     created_at: task.created_at,
-    //     deadline: task.deadline || "",
-    //     last_edit: task.last_edit || "",
-    //     room: "TODO",
-    //   })),
-    // };
-    // exportTasksToWord(data);
-    // const data = {
-    //   fileName,
-    //   language,
-    //   headerChecked,
-    //   header1,
-    //   header2,
-    //   footerChecked,
-    //   footer1,
-    //   footer2,
-    //   footer3,
-    //   coverChecked,
-    //   cover1,
-    //   cover2,
-    //   cover3,
-    //   coverType,
-    // };
+    const data = {
+      fileName,
+      language,
+      headerChecked,
+      left_header,
+      right_header,
+      footerChecked,
+      left_footer,
+      center_footer,
+      right_footer,
+      company_name,
+      report_title,
+      lorem_text,
+      cover_page_001: coverChecked && coverType === "001",
+      cover_page_002: coverChecked && coverType === "002",
+      cover_page_003: coverChecked && coverType === "003",
+      cover_page_004: coverChecked && coverType === "004",
+      cover_page_005: coverChecked && coverType === "005",
+      cover_page_006: coverChecked && coverType === "006",
+    };
+    onConfirm(data);
     dialogProps.onClose?.({}, "backdropClick");
   };
   return (
@@ -190,8 +195,8 @@ const ExportDocxDialog = ({
             fullWidth
             margin="normal"
             disabled={!headerChecked}
-            value={header1}
-            onChange={handleHeader1Change}
+            value={left_header}
+            onChange={handle_left_header_change}
           />
           <TextField
             label="Right header"
@@ -199,8 +204,8 @@ const ExportDocxDialog = ({
             fullWidth
             margin="normal"
             disabled={!headerChecked}
-            value={header2}
-            onChange={handleHeader2Change}
+            value={right_header}
+            onChange={handle_right_header_change}
           />
         </Box>
         <FormControlLabel
@@ -220,8 +225,8 @@ const ExportDocxDialog = ({
             fullWidth
             margin="normal"
             disabled={!footerChecked}
-            value={footer1}
-            onChange={handleFooter1Change}
+            value={left_footer}
+            onChange={handle_left_footer_change}
           />
           <TextField
             label="Center footer"
@@ -229,8 +234,8 @@ const ExportDocxDialog = ({
             fullWidth
             margin="normal"
             disabled={!footerChecked}
-            value={footer2}
-            onChange={handleFooter2Change}
+            value={center_footer}
+            onChange={handle_center_footer_change}
           />
           <TextField
             label="Right footer"
@@ -238,8 +243,8 @@ const ExportDocxDialog = ({
             fullWidth
             margin="normal"
             disabled={!footerChecked}
-            value={footer3}
-            onChange={handleFooter3Change}
+            value={right_footer}
+            onChange={handle_right_footer_change}
           />
         </Box>
         <FormControlLabel
@@ -259,8 +264,8 @@ const ExportDocxDialog = ({
             fullWidth
             margin="normal"
             disabled={!coverChecked}
-            value={cover1}
-            onChange={handleCover1Change}
+            value={company_name}
+            onChange={handle_company_name_change}
           />
           <TextField
             label="Report title"
@@ -268,8 +273,8 @@ const ExportDocxDialog = ({
             fullWidth
             margin="normal"
             disabled={!coverChecked}
-            value={cover2}
-            onChange={handleCover2Change}
+            value={report_title}
+            onChange={handle_report_title_change}
           />
         </Box>
         <TextField
@@ -278,8 +283,8 @@ const ExportDocxDialog = ({
           fullWidth
           margin="normal"
           disabled={!coverChecked}
-          value={cover3}
-          onChange={handleCover3Change}
+          value={lorem_text}
+          onChange={handle_lorem_textChange}
         />
         <FormControl fullWidth margin="normal">
           <InputLabel>Loại bìa</InputLabel>
@@ -291,12 +296,12 @@ const ExportDocxDialog = ({
             fullWidth
             disabled={!coverChecked}
           >
-            <MenuItem value="Loại 1">Loại 1</MenuItem>
-            <MenuItem value="Loại 2">Loại 2</MenuItem>
-            <MenuItem value="Loại 3">Loại 3</MenuItem>
-            <MenuItem value="Loại 4">Loại 4</MenuItem>
-            <MenuItem value="Loại 5">Loại 5</MenuItem>
-            <MenuItem value="Loại 6">Loại 6</MenuItem>
+            <MenuItem value="001">Loại 1</MenuItem>
+            <MenuItem value="002">Loại 2</MenuItem>
+            <MenuItem value="003">Loại 3</MenuItem>
+            <MenuItem value="004">Loại 4</MenuItem>
+            <MenuItem value="005">Loại 5</MenuItem>
+            <MenuItem value="006">Loại 6</MenuItem>
           </Select>
         </FormControl>
         <Box display="flex" justifyContent="flex-end" mt={2}>

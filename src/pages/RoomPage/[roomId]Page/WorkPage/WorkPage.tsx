@@ -14,6 +14,7 @@ import CreateTaskDialog from "../../../../modules/task/components/CreateTaskDial
 import TaskHelper from "../../../../modules/task/util/task-helper";
 import ShowMenuButton from "../../../../lib/components/ShowMenuButton/ShowMenuButton";
 import ExportDocxDialog from "../../../../modules/task/components/ExportDocxDialog/ExportDocxDialog";
+import exportTasksToWord from "../../../../modules/task/util/export-tasks-to-word";
 
 const WorkPage = () => {
   const [tasksToDo, setTasksToDo] = useState<TaskData[]>([]);
@@ -364,6 +365,25 @@ const WorkPage = () => {
       <ExportDocxDialog
         open={openExportDocxDialog}
         onClose={() => setOpenExportDocxDialog(false)}
+        onConfirm={(data) => {
+          exportTasksToWord(
+            {
+              ...data,
+              tasks: tasks.map((task) => ({
+                title: task.title,
+                content: task.content || "",
+                status: task.status,
+                assignee_id: task.assignee_id,
+                creator_id: task.creator_id,
+                created_at: task.created_at,
+                deadline: task.deadline || "",
+                last_edit: task.last_edit || "",
+                room: "TODO",
+              })),
+            },
+            (data.fileName || "output") + ".docx"
+          );
+        }}
       />
     </>
   );
