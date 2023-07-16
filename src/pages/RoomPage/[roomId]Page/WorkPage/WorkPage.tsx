@@ -17,12 +17,14 @@ import ExportDocxDialog from "../../../../modules/task/components/ExportDocxDial
 import exportTasksToWord from "../../../../modules/task/util/export-tasks-to-word";
 import convertTimeToTimeString from "../../../../lib/util/convert-time-to-time-string";
 import UserHelper from "../../../../modules/user/util/user-helper";
+import useAppSnackbar from "../../../../lib/hook/useAppSnackBar";
 
 const WorkPage = () => {
   const [tasksToDo, setTasksToDo] = useState<TaskData[]>([]);
   const [tasksDoing, setTasksDoing] = useState<TaskData[]>([]);
   const [tasksDone, setTasksDone] = useState<TaskData[]>([]);
   const [tasksReviewing, setTasksReviewing] = useState<TaskData[]>([]);
+  const { showSnackbarError } = useAppSnackbar();
 
   const { getCurrentRoom, currentRoom } = useRooms();
   const { roomId } = useParams();
@@ -213,7 +215,7 @@ const WorkPage = () => {
                     setOpenExportDocxDialog(true);
                   },
                   () => {
-                    console.log(tasks);
+                    showSnackbarError("Tính năng chưa có sẵn!");
                   },
                   () => {},
                 ]}
