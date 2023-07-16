@@ -120,7 +120,8 @@ const ExportDocxDialog = ({
   const handleConfirm = () => {
     const data = {
       fileName,
-      language,
+      en: language === "EN",
+      vi: language === "VI",
       headerChecked,
       left_header,
       right_header,

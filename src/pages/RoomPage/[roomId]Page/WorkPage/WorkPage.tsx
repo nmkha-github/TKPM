@@ -15,6 +15,8 @@ import TaskHelper from "../../../../modules/task/util/task-helper";
 import ShowMenuButton from "../../../../lib/components/ShowMenuButton/ShowMenuButton";
 import ExportDocxDialog from "../../../../modules/task/components/ExportDocxDialog/ExportDocxDialog";
 import exportTasksToWord from "../../../../modules/task/util/export-tasks-to-word";
+import convertTimeToTimeString from "../../../../lib/util/convert-time-to-time-string";
+import UserHelper from "../../../../modules/user/util/user-helper";
 
 const WorkPage = () => {
   const [tasksToDo, setTasksToDo] = useState<TaskData[]>([]);
@@ -365,23 +367,32 @@ const WorkPage = () => {
       <ExportDocxDialog
         open={openExportDocxDialog}
         onClose={() => setOpenExportDocxDialog(false)}
-        onConfirm={(data) => {
-          exportTasksToWord(
-            {
-              ...data,
-              tasks: tasks.map((task) => ({
+        onConfirm={async (config_data) => {
+          const tasksData = await Promise.all(
+            tasks.map(async (task) => {
+              const assignee = await UserHelper.getUserById(task.assignee_id);
+              const creator = await UserHelper.getUserById(task.creator_id);
+              return {
                 title: task.title,
                 content: task.content || "",
                 status: task.status,
-                assignee_id: task.assignee_id,
-                creator_id: task.creator_id,
-                created_at: task.created_at,
-                deadline: task.deadline || "",
+                assignee: assignee?.name || "",
+                creator: creator?.name || "",
+                created_at: convertTimeToTimeString(task.created_at || ""),
+                deadline: convertTimeToTimeString(task.deadline || ""),
                 last_edit: task.last_edit || "",
-                room: "TODO",
-              })),
+                description: task.content || "",
+                room: currentRoom.name || "",
+              };
+            })
+          );
+
+          await exportTasksToWord(
+            {
+              ...config_data,
+              tasks: tasksData,
             },
-            (data.fileName || "output") + ".docx"
+            (config_data.fileName || "output") + ".docx"
           );
         }}
       />
