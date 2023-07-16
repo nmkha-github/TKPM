@@ -16,6 +16,12 @@ import {
   Button,
   SelectChangeEvent,
 } from "@mui/material";
+import docxPageCoverTemplate1 from "../../../../assets/images/docx-page-cover-template1.jpg";
+import docxPageCoverTemplate2 from "../../../../assets/images/docx-page-cover-template2.jpg";
+import docxPageCoverTemplate3 from "../../../../assets/images/docx-page-cover-template3.jpg";
+import docxPageCoverTemplate4 from "../../../../assets/images/docx-page-cover-template4.jpg";
+import docxPageCoverTemplate5 from "../../../../assets/images/docx-page-cover-template5.jpg";
+import docxPageCoverTemplate6 from "../../../../assets/images/docx-page-cover-template6.jpg";
 
 interface ExportDocxDialogProps {
   onConfirm: (any) => void;
@@ -142,6 +148,16 @@ const ExportDocxDialog = ({
     onConfirm(data);
     dialogProps.onClose?.({}, "backdropClick");
   };
+
+  const coverOptions = [
+    { value: "001", label: "Loại 1", image: docxPageCoverTemplate1 },
+    { value: "002", label: "Loại 2", image: docxPageCoverTemplate2 },
+    { value: "003", label: "Loại 3", image: docxPageCoverTemplate3 },
+    { value: "004", label: "Loại 4", image: docxPageCoverTemplate4 },
+    { value: "005", label: "Loại 5", image: docxPageCoverTemplate5 },
+    { value: "006", label: "Loại 6", image: docxPageCoverTemplate6 },
+  ];
+
   return (
     <Dialog
       fullScreen={fullScreen}
@@ -296,13 +312,37 @@ const ExportDocxDialog = ({
             label="Loại bìa"
             fullWidth
             disabled={!coverChecked}
+            renderValue={(selected) => (
+              <Box display="flex" alignItems="center" gap={1}>
+                <img
+                  src={
+                    coverOptions.find((option) => option.value === selected)
+                      ?.image
+                  }
+                  alt={selected}
+                  style={{ width: "100px", height: "auto" }}
+                />
+                <Typography>
+                  {
+                    coverOptions.find((option) => option.value === selected)
+                      ?.label
+                  }
+                </Typography>
+              </Box>
+            )}
           >
-            <MenuItem value="001">Loại 1</MenuItem>
-            <MenuItem value="002">Loại 2</MenuItem>
-            <MenuItem value="003">Loại 3</MenuItem>
-            <MenuItem value="004">Loại 4</MenuItem>
-            <MenuItem value="005">Loại 5</MenuItem>
-            <MenuItem value="006">Loại 6</MenuItem>
+            {coverOptions.map((option) => (
+              <MenuItem key={option.value} value={option.value}>
+                <Box display="flex" alignItems="center" gap={2} padding={1}>
+                  <img
+                    src={option.image}
+                    alt={option.value}
+                    style={{ width: "100px", height: "auto" }}
+                  />
+                  <Typography>{option.label}</Typography>
+                </Box>
+              </MenuItem>
+            ))}
           </Select>
         </FormControl>
         <Box display="flex" justifyContent="flex-end" mt={2}>
