@@ -36,12 +36,11 @@ const RoomItem = ({ roomData, ...boxProps }: RoomItemProps & BoxProps) => {
       style={{
         backgroundColor: "#c0feff",
         color: "white",
-        borderRadius: 12,
-        borderColor: "#1da6fa",
-        borderWidth: "medium",
+        borderRadius: 8,
         overflow: "hidden",
         ...boxProps.style,
       }}
+      sx={{ boxShadow: 2 }}
       onDoubleClick={() => {
         navigate(`/room/${roomData.id}/newsfeed`);
       }}

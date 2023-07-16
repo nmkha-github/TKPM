@@ -57,6 +57,7 @@ import { Timestamp } from "firebase/firestore";
 import TaskHelper from "../../util/task-helper";
 import makeStyles from "@mui/styles/makeStyles";
 import { useConfirmDialog } from "../../../../lib/provider/ConfirmDialogProvider";
+import useAppSnackbar from "../../../../lib/hook/useAppSnackBar";
 
 interface TaskDetailDialogProps {
   task?: TaskData;
@@ -161,6 +162,7 @@ const TaskDetailDialog = ({
   const [isEditingContent, setIsEditingContent] = useState(false);
   const [isEditingDeadline, setIsEditingDeadline] = useState(false);
   const [editTask, setEditTask] = useState<TaskData>({ ...emptyTask });
+  const { showSnackbarError } = useAppSnackbar();
 
   const [moreActionsAnchorEl, setMoreActionsAnchorEl] =
     useState<null | HTMLElement>(null);
@@ -344,6 +346,7 @@ const TaskDetailDialog = ({
               <UploadFile
                 onSuccess={async (file) => {
                   console.log(file.url);
+                  showSnackbarError("Tính năng chưa có sẵn");
                   // chưa có hàm add file trong provider. (updateTask ko có attach_files)
                 }}
               >
@@ -373,7 +376,9 @@ const TaskDetailDialog = ({
                 <Button
                   startIcon={<AccountTreeIcon />}
                   className={classes.body_action}
-                  onClick={() => {}}
+                  onClick={() => {
+                    showSnackbarError("Tính năng chưa có sẵn");
+                  }}
                 >
                   Thêm việc con
                 </Button>
@@ -389,7 +394,9 @@ const TaskDetailDialog = ({
                 <Button
                   startIcon={<AddLinkIcon />}
                   className={classes.body_action}
-                  onClick={() => {}}
+                  onClick={() => {
+                    showSnackbarError("Tính năng chưa có sẵn");
+                  }}
                 >
                   Liên kết việc
                 </Button>
@@ -405,7 +412,9 @@ const TaskDetailDialog = ({
                 <Button
                   startIcon={<MoreHorizIcon />}
                   className={classes.body_action}
-                  onClick={() => {}}
+                  onClick={() => {
+                    showSnackbarError("Tính năng chưa có sẵn");
+                  }}
                 >
                   Khác
                 </Button>
@@ -712,7 +721,10 @@ const TaskDetailDialog = ({
         </MenuItem>
 
         <MenuItem
-          onClick={() => setMoreActionsAnchorEl(null)}
+          onClick={() => {
+            setMoreActionsAnchorEl(null);
+            showSnackbarError("Tính năng chưa có sẵn");
+          }}
           style={{ display: "block", padding: "8px 12px" }}
         >
           Nhân bản công việc
@@ -728,7 +740,10 @@ const TaskDetailDialog = ({
         </MenuItem>
 
         <MenuItem
-          onClick={() => setMoreActionsAnchorEl(null)}
+          onClick={() => {
+            setMoreActionsAnchorEl(null);
+            showSnackbarError("Tính năng chưa có sẵn");
+          }}
           style={{ display: "block", padding: "8px 12px" }}
         >
           In

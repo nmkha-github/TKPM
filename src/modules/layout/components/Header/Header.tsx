@@ -1,7 +1,7 @@
 import { Box, Button, Tooltip, Typography } from "@mui/material";
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import APP_LOGO from "../../constants/app-logo";
+import APP_LOGO from "../../../../assets/images/app-logo.png";
 import HeaderUserInfo from "../HeaderUserInfo/HeaderUserInfo";
 import makeStyles from "@mui/styles/makeStyles";
 
@@ -112,7 +112,7 @@ const Header = ({ children }: HeaderProps) => {
     >
       {needAuth && (
         <Box className={classes.header}>
-          <Tooltip title="nmcnpm-group24.vercel.app">
+          <Tooltip title="tkpm-olive.vercel.app">
             <img
               className={classes.logo}
               src={APP_LOGO}
