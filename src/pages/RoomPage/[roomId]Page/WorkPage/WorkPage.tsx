@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import LeftSideBar from "../../../../modules/room/components/LeftSideBar/LeftSideBar";
 import { useRooms } from "../../../../lib/provider/RoomsProvider";
 import { useParams } from "react-router-dom";
@@ -23,6 +23,7 @@ import TaskStatusData from "../../../../modules/task/interface/task-status-data"
 import truncate from "../../../../lib/util/truncate";
 import InputDialog from "../../../../lib/components/InputDialog/InputDialog";
 import { useConfirmDialog } from "../../../../lib/provider/ConfirmDialogProvider";
+import { CSVLink } from "react-csv";
 
 const WorkPage = () => {
   const { showSnackbarError } = useAppSnackbar();
@@ -42,11 +43,10 @@ const WorkPage = () => {
     getTasks,
     updateTask,
     deleteTask,
-    updatingTask,
     currentTask,
     setCurrentTask,
   } = useTasks();
-  
+
   const [openCreateTaskDialog, setOpenCreateTaskDialog] = useState(false);
   const [openExportDocxDialog, setOpenExportDocxDialog] = useState(false);
   const [hoverTitleTaskList, setHoverTitleTaskList] = useState("");
@@ -198,6 +198,51 @@ const WorkPage = () => {
     // }
   };
 
+  const [tasksDataCSV, setTasksDataCSV] = useState<string[][]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const rows = await Promise.all(
+        tasks.map(async (task) => {
+          const assignee = await UserHelper.getUserById(task.assignee_id);
+          const creator = await UserHelper.getUserById(task.creator_id);
+          return [
+            task.id || "",
+            task.title,
+            task.content || "",
+            task.status,
+            task.creator_id || "",
+            creator?.name || "",
+            convertTimeToTimeString(task.created_at || ""),
+            task.assignee_id || "",
+            assignee?.name || "",
+            convertTimeToTimeString(task.deadline || ""),
+          ];
+        })
+      );
+
+      const data = [
+        [
+          "ID",
+          "Title",
+          "Content",
+          "Status",
+          "Creator's ID",
+          "Creator",
+          "Created at",
+          "Assignee's ID",
+          "Assignee",
+          "Deadline",
+        ],
+        ...rows,
+      ];
+
+      setTasksDataCSV(data);
+    };
+
+    fetchData();
+  }, [tasks]);
+
   return (
     <>
       <LeftSideBar>
@@ -232,21 +277,42 @@ const WorkPage = () => {
             />
 
             {/* Actions Button */}
-            <Box style={{ marginRight: "1rem" }}>
-              <ShowMenuButton
-                title="Xuất"
-                itemsTitle={["Xuất Word", "Xuất HTML", "Xuất CSV"]}
-                itemsAction={[
-                  () => {
-                    setOpenExportDocxDialog(true);
-                  },
-                  () => {
-                    showSnackbarError("Tính năng chưa có sẵn!");
-                  },
-                  () => {},
-                ]}
-                tooltipTitle="Xuất tất cả công việc"
-              />
+            <Box
+              style={{
+                marginRight: "1rem",
+                display: "flex",
+                gap: "10px",
+                alignItems: "center",
+              }}
+            >
+              <Button
+                style={{
+                  color: "rgb(23,43,77)",
+                  textTransform: "none",
+                  background: "#DDD",
+                }}
+                onClick={() => {
+                  setOpenExportDocxDialog(true);
+                }}
+              >
+                Xuất docx
+              </Button>
+
+              <CSVLink
+                data={tasksDataCSV}
+                filename={"e-workroom.csv"}
+                style={{
+                  textDecoration: "none",
+                  padding: "6px",
+                  display: "block",
+                  color: "rgb(23,43,77)",
+                  textTransform: "none",
+                  background: "#DDD",
+                  borderRadius: "4px",
+                }}
+              >
+                Xuất CSV
+              </CSVLink>
             </Box>
           </Box>
 
@@ -498,7 +564,7 @@ const WorkPage = () => {
           }}
         />
       )}
-        
+
       <ExportDocxDialog
         open={openExportDocxDialog}
         onClose={() => setOpenExportDocxDialog(false)}
