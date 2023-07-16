@@ -159,7 +159,7 @@ const HomePage = () => {
                     }}
                     onClick={() =>
                       window.open(
-                        "https://www.youtube.com/watch?v=SuqU904ZHA4&ab_channel=Fireship"
+                        "https://drive.google.com/drive/folders/14q2hZgW__ZNl_-r3CKax-c6Kpn7fqY4f?usp=sharing"
                       )
                     }
                   >
