@@ -13,7 +13,11 @@ import { DragDropContext, DragStart, DropResult } from "react-beautiful-dnd";
 import CreateTaskDialog from "../../../../modules/task/components/CreateTaskDialog/CreateTaskDialog";
 import TaskHelper from "../../../../modules/task/util/task-helper";
 import ShowMenuButton from "../../../../lib/components/ShowMenuButton/ShowMenuButton";
+import ExportDocxDialog from "../../../../modules/task/components/ExportDocxDialog/ExportDocxDialog";
 import exportTasksToWord from "../../../../modules/task/util/export-tasks-to-word";
+import convertTimeToTimeString from "../../../../lib/util/convert-time-to-time-string";
+import UserHelper from "../../../../modules/user/util/user-helper";
+import useAppSnackbar from "../../../../lib/hook/useAppSnackBar";
 import { BiArrowFromLeft, BiArrowFromRight, BiPlus, BiX } from "react-icons/bi";
 import TaskStatusData from "../../../../modules/task/interface/task-status-data";
 import truncate from "../../../../lib/util/truncate";
@@ -21,6 +25,7 @@ import InputDialog from "../../../../lib/components/InputDialog/InputDialog";
 import { useConfirmDialog } from "../../../../lib/provider/ConfirmDialogProvider";
 
 const WorkPage = () => {
+  const { showSnackbarError } = useAppSnackbar();
   const { getCurrentRoom, currentRoom } = useRooms();
   const { roomId } = useParams();
   const {
@@ -41,12 +46,13 @@ const WorkPage = () => {
     currentTask,
     setCurrentTask,
   } = useTasks();
+  
   const [openCreateTaskDialog, setOpenCreateTaskDialog] = useState(false);
+  const [openExportDocxDialog, setOpenExportDocxDialog] = useState(false);
   const [hoverTitleTaskList, setHoverTitleTaskList] = useState("");
   const [showInputDialog, setShowInputDialog] = useState("");
   const [editTaskStatus, setEditTaskStatus] = useState<TaskStatusData>();
   const [isDraggingId, setIsDraggingId] = useState("-1");
-
   const { showConfirmDialog } = useConfirmDialog();
 
   useEffect(() => {
@@ -232,23 +238,10 @@ const WorkPage = () => {
                 itemsTitle={["Xuất Word", "Xuất HTML", "Xuất CSV"]}
                 itemsAction={[
                   () => {
-                    const data = {
-                      tasks: tasks.map((task) => ({
-                        title: task.title,
-                        content: task.content || "",
-                        status: task.status,
-                        assignee_id: task.assignee_id,
-                        creator_id: task.creator_id,
-                        created_at: task.created_at,
-                        deadline: task.deadline || "",
-                        last_edit: task.last_edit || "",
-                        room: "TODO",
-                      })),
-                    };
-                    exportTasksToWord(data);
+                    setOpenExportDocxDialog(true);
                   },
                   () => {
-                    console.log(tasks);
+                    showSnackbarError("Tính năng chưa có sẵn!");
                   },
                   () => {},
                 ]}
@@ -505,6 +498,39 @@ const WorkPage = () => {
           }}
         />
       )}
+        
+      <ExportDocxDialog
+        open={openExportDocxDialog}
+        onClose={() => setOpenExportDocxDialog(false)}
+        onConfirm={async (config_data) => {
+          const tasksData = await Promise.all(
+            tasks.map(async (task) => {
+              const assignee = await UserHelper.getUserById(task.assignee_id);
+              const creator = await UserHelper.getUserById(task.creator_id);
+              return {
+                title: task.title,
+                content: task.content || "",
+                status: task.status,
+                assignee: assignee?.name || "",
+                creator: creator?.name || "",
+                created_at: convertTimeToTimeString(task.created_at || ""),
+                deadline: convertTimeToTimeString(task.deadline || ""),
+                last_edit: task.last_edit || "",
+                description: task.content || "",
+                room: currentRoom.name || "",
+              };
+            })
+          );
+
+          await exportTasksToWord(
+            {
+              ...config_data,
+              tasks: tasksData,
+            },
+            (config_data.fileName || "output") + ".docx"
+          );
+        }}
+      />
     </>
   );
 };
